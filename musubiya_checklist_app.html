@@ -1261,7 +1261,7 @@ function renderFinal(){
     + '<button class="secondary-btn" id="copyBtn">コピー</button>'
     + '<button class="secondary-btn" id="saveHistBtn">履歴に保存</button></div>'
     + '<div class="copied-msg" id="copyMsg"></div>'
-    + '<a class="line-open-btn" id="lineOpenBtn" href="line://" hidden>LINEを開く</a>'
+    + '<a class="line-open-btn" id="lineOpenBtn" href="https://line.me/R/msg/text/" hidden>LINEを開く</a>'
     + '<button class="warn-btn" id="newCleanBtn">この清掃を終了して新しい清掃を開始</button>';
 
   $("#panel-final").innerHTML = html;
@@ -1428,12 +1428,22 @@ function refreshReport(){
     w.textContent = u.length ? "⚠ 未完了が" + u.length + "件あります。内容を確認してください。" : "✅ 全項目完了です。";
   }
 }
+function buildLinePrefillText(){
+  const done = doneIn(SEC.flow) + doneIn(SEC.area) + doneIn(SEC.supply) + doneIn(SEC.final);
+  const pct = Math.round(done / TOTAL * 100);
+  return "【清掃完了報告】" + state.room + "・" + fmtDate(state.date) + "・" + state.staff
+    + "\n進捗：" + done + "/" + TOTAL + "（" + pct + "%）"
+    + "\n（全文はコピー済みです。この下に貼り付けてください）";
+}
 function copyReport(){
   const text = $("#reportOut").value;
   const ok = () => {
     $("#copyMsg").textContent = "コピーしました。LINEに貼り付けてください。";
     const lb = $("#lineOpenBtn");
-    if(lb) lb.hidden = false;
+    if(lb){
+      lb.href = "https://line.me/R/msg/text/" + encodeURIComponent(buildLinePrefillText());
+      lb.hidden = false;
+    }
   };
   if(navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(text).then(ok).catch(() => fallbackCopy(text, ok));
