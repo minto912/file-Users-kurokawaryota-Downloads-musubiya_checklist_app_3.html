@@ -436,6 +436,24 @@ textarea.notes:focus{border-color:var(--green);outline:none}
   margin-top:8px;
   min-height:1.4em;
 }
+.line-open-btn{
+  display:block;
+  width:100%;
+  min-height:54px;
+  text-align:center;
+  text-decoration:none;
+  line-height:calc(54px - 5px);
+  background:#06C755;
+  color:#fff;
+  border:2.5px solid #05B34C;
+  border-radius:999px;
+  font-size:1rem;
+  font-weight:800;
+  box-shadow:0 4px 0 #049644;
+  margin-top:8px;
+}
+.line-open-btn:active{transform:scale(.96);opacity:.92}
+.line-open-btn[hidden]{display:none}
 
 /* 下部タブバー */
 #tabbar{
@@ -1243,6 +1261,7 @@ function renderFinal(){
     + '<button class="secondary-btn" id="copyBtn">コピー</button>'
     + '<button class="secondary-btn" id="saveHistBtn">履歴に保存</button></div>'
     + '<div class="copied-msg" id="copyMsg"></div>'
+    + '<a class="line-open-btn" id="lineOpenBtn" href="line://" hidden>LINEを開く</a>'
     + '<button class="warn-btn" id="newCleanBtn">この清掃を終了して新しい清掃を開始</button>';
 
   $("#panel-final").innerHTML = html;
@@ -1411,7 +1430,11 @@ function refreshReport(){
 }
 function copyReport(){
   const text = $("#reportOut").value;
-  const ok = () => { $("#copyMsg").textContent = "コピーしました。LINEに貼り付けてください。"; };
+  const ok = () => {
+    $("#copyMsg").textContent = "コピーしました。LINEに貼り付けてください。";
+    const lb = $("#lineOpenBtn");
+    if(lb) lb.hidden = false;
+  };
   if(navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(text).then(ok).catch(() => fallbackCopy(text, ok));
   } else {
