@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#7FC8A9">
+<title>MUSUBIYA SAPPORO 清掃チェック</title>
+<style>
+:root{
+  --green:#5FB08A;
+  --green-deep:#3E8A68;
+  --gold:#F5A9B8;
+  --pink:#F5A9B8;
+  --pink-deep:#E8879C;
+  --paper:#FFF9F0;
+  --card:#FFFFFF;
+  --ink:#5A4A42;
+  --ink-sub:#A08D82;
+  --line:#F3E3D3;
+  --danger:#E88B7D;
+  --serif:"Hiragino Maru Gothic ProN","HG丸ｺﾞｼｯｸM-PRO","Yu Gothic UI","Noto Sans JP",sans-serif;
+  --sans:"Hiragino Maru Gothic ProN","HG丸ｺﾞｼｯｸM-PRO","Yu Gothic UI","Noto Sans JP",-apple-system,"Segoe UI",sans-serif;
+  --shadow:0 4px 0 rgba(233,196,182,.45);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{
+  font-family:var(--sans);
+  background:var(--paper);
+  background-image:radial-gradient(#FDEDE0 12%, transparent 13%),radial-gradient(#FDEDE0 12%, transparent 13%);
+  background-size:44px 44px;
+  background-position:0 0,22px 22px;
+  color:var(--ink);
+  line-height:1.6;
+  min-height:100vh;
+}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--pink);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
+
+/* ---------- 開始画面 ---------- */
+#startView{
+  max-width:480px;margin:0 auto;
+  padding:32px 20px calc(40px + env(safe-area-inset-bottom));
+}
+.brand{
+  color:var(--green-deep);
+  font-size:1.5rem;
+  letter-spacing:.06em;
+  font-weight:800;
+}
+.brand small{
+  display:block;
+  color:var(--pink-deep);
+  font-size:.95rem;
+  letter-spacing:.12em;
+  margin-top:2px;
+  font-weight:700;
+}
+.brand::after{content:" 🦆";font-size:1.3rem}
+.start-lead{
+  color:var(--ink-sub);
+  font-size:.85rem;
+  margin:14px 0 26px;
+  padding-top:12px;
+  border-top:3px dotted var(--pink);
+}
+.field-label{
+  font-size:.85rem;
+  color:var(--green-deep);
+  font-weight:800;
+  letter-spacing:.08em;
+  margin:22px 0 8px;
+}
+.field-label::before{content:"🌸 ";font-size:.8rem}
+.room-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.room-btn{
+  min-height:60px;
+  background:var(--card);
+  border:2.5px solid var(--line);
+  border-radius:20px;
+  font-size:1.05rem;
+  font-weight:700;
+  color:var(--ink);
+  letter-spacing:.08em;
+  position:relative;
+  box-shadow:var(--shadow);
+  transition:border-color .15s, background .15s, transform .1s;
+}
+.room-btn:active{transform:scale(.95)}
+.room-btn::before{
+  content:"";
+  position:absolute;left:12px;top:12px;bottom:12px;width:5px;
+  background:var(--line);border-radius:3px;
+  transition:background .15s;
+}
+.room-btn.sel{
+  border-color:var(--green);
+  background:#E9F7EF;
+  font-weight:800;
+  color:var(--green-deep);
+}
+.room-btn.sel::before{background:var(--pink)}
+.room-btn.sel::after{
+  content:"♪";
+  position:absolute;right:10px;top:6px;
+  color:var(--pink-deep);font-size:.9rem;font-weight:800;
+}
+.text-input{
+  width:100%;
+  min-height:52px;
+  padding:10px 16px;
+  font-size:1.05rem;
+  font-family:var(--sans);
+  border:2.5px solid var(--line);
+  border-radius:18px;
+  background:var(--card);
+  color:var(--ink);
+}
+.text-input:focus{border-color:var(--green);outline:none}
+.primary-btn{
+  width:100%;
+  min-height:58px;
+  margin-top:30px;
+  background:linear-gradient(180deg,#6FBE97,#5FB08A);
+  color:#fff;
+  border:none;
+  border-radius:999px;
+  font-size:1.1rem;
+  font-weight:800;
+  letter-spacing:.1em;
+  box-shadow:0 5px 0 #4A9573;
+  transition:transform .1s;
+}
+.primary-btn::before{content:"🧹 "}
+.primary-btn:active{transform:translateY(3px);box-shadow:0 2px 0 #4A9573}
+.primary-btn:disabled{background:#D8CFC4;box-shadow:0 5px 0 #C4B8A9;cursor:default}
+.primary-btn:disabled::before{content:"💤 "}
+
+/* ---------- アプリ本体 ---------- */
+#appView{padding-bottom:calc(78px + env(safe-area-inset-bottom))}
+.app-header{
+  position:sticky;top:0;z-index:20;
+  background:linear-gradient(180deg,#6FBE97,#5FB08A);
+  color:#fff;
+  padding:10px 14px 12px;
+  border-radius:0 0 22px 22px;
+  box-shadow:0 3px 8px rgba(95,176,138,.3);
+}
+.hdr-top{
+  display:flex;align-items:center;gap:8px;
+  max-width:640px;margin:0 auto;
+}
+.hdr-brand{
+  font-size:.95rem;
+  font-weight:800;
+  letter-spacing:.05em;
+  flex:1;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.hdr-session{
+  font-size:.78rem;
+  font-weight:600;
+  color:#E4F5EC;
+  white-space:nowrap;
+}
+.info-btn{
+  width:40px;height:40px;flex:none;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.7);
+  background:rgba(255,255,255,.15);
+  color:#fff;
+  font-size:1rem;
+  font-weight:800;
+}
+.progress-wrap{
+  max-width:640px;margin:8px auto 0;
+  display:flex;align-items:center;gap:10px;
+}
+#duckRunner{
+  flex:none;font-size:1.25rem;line-height:1;
+  transform-origin:50% 100%;
+}
+#duckRunner.hop{animation:duckhop .45s ease}
+@keyframes duckhop{
+  0%{transform:translateY(0) scale(1)}
+  40%{transform:translateY(-7px) scale(1.15) rotate(-8deg)}
+  100%{transform:translateY(0) scale(1)}
+}
+.progress-track{
+  flex:1;height:14px;border-radius:8px;
+  background:rgba(255,255,255,.35);
+  overflow:hidden;
+  border:1.5px solid rgba(255,255,255,.5);
+}
+.progress-fill{
+  height:100%;width:0%;
+  background:repeating-linear-gradient(45deg,var(--pink),var(--pink) 8px,#F8C1CC 8px,#F8C1CC 16px);
+  border-radius:8px;
+  transition:width .3s ease;
+}
+.progress-num{
+  font-size:.8rem;font-weight:800;
+  font-variant-numeric:tabular-nums;
+  min-width:8.5em;text-align:right;
+}
+
+main{max-width:640px;margin:0 auto;padding:14px 12px 20px}
+.panel[hidden]{display:none}
+
+/* セクション見出し */
+.sec-head{
+  display:flex;align-items:baseline;gap:8px;
+  margin:20px 2px 8px;
+}
+.sec-head:first-child{margin-top:4px}
+.sec-title{
+  font-size:1.05rem;
+  font-weight:800;
+  color:var(--green-deep);
+  letter-spacing:.06em;
+}
+.sec-title::before{content:"🍀 ";font-size:.9rem}
+.sec-count{
+  font-size:.8rem;color:var(--ink-sub);
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+.sec-note{
+  font-size:.78rem;color:var(--ink-sub);
+  margin:2px 2px 10px;
+}
+
+/* チェック行 */
+.card{
+  background:var(--card);
+  border:2px solid var(--line);
+  border-radius:20px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.row{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:14px 14px 14px 18px;
+  min-height:58px;
+  border-bottom:2px dotted var(--line);
+  position:relative;
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-select:none;
+  transition:background .15s;
+}
+.row:last-child{border-bottom:none}
+.row:active{background:#FFF3F5}
+.row::before{
+  content:"";
+  position:absolute;left:0;top:0;bottom:0;width:7px;
+  background:var(--band,transparent);
+}
+.chk{
+  flex:none;
+  width:32px;height:32px;
+  margin-top:2px;
+  border:2.5px solid #E0C9B8;
+  border-radius:50%;
+  background:#fff;
+  position:relative;
+  transition:background .15s,border-color .15s,transform .15s;
+}
+.row[aria-checked="true"] .chk{
+  background:var(--pink);
+  border-color:var(--pink-deep);
+  transform:scale(1.08);
+}
+.row[aria-checked="true"] .chk::after{
+  content:"";
+  position:absolute;left:10px;top:5px;
+  width:8px;height:14px;
+  border:solid #fff;border-width:0 3.5px 3.5px 0;
+  transform:rotate(45deg);
+}
+.row-body{flex:1;min-width:0}
+.row-no{
+  color:var(--pink-deep);
+  font-weight:800;
+  margin-right:4px;
+}
+.row-text{font-size:.98rem;font-weight:600}
+.row[aria-checked="true"] .row-text{
+  color:var(--ink-sub);
+  text-decoration:line-through;
+  text-decoration-color:#E8B7C1;
+}
+.row-point{
+  display:block;
+  font-size:.78rem;
+  color:var(--ink-sub);
+  margin-top:3px;
+}
+.jump-chip{
+  display:inline-block;
+  margin-top:8px;
+  padding:7px 14px;
+  font-size:.78rem;
+  font-weight:800;
+  color:var(--green-deep);
+  background:#E9F7EF;
+  border:2px solid var(--green);
+  border-radius:999px;
+}
+
+/* アコーディオン（エリア別） */
+.acc{margin-bottom:12px}
+.acc-head{
+  width:100%;
+  display:flex;align-items:center;gap:10px;
+  padding:14px 16px;
+  min-height:56px;
+  border:none;
+  border-radius:20px;
+  color:#5A4A42;
+  font-size:.98rem;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-align:left;
+  box-shadow:var(--shadow);
+}
+.acc.open .acc-head{border-radius:20px 20px 0 0;box-shadow:none}
+.acc-head .acc-count{
+  margin-left:auto;
+  font-size:.82rem;
+  font-weight:800;
+  font-variant-numeric:tabular-nums;
+  background:rgba(255,255,255,.75);
+  padding:2px 12px;
+  border-radius:999px;
+}
+.acc-head .acc-arrow{
+  font-size:.8rem;
+  transition:transform .2s;
+}
+.acc.open .acc-arrow{transform:rotate(180deg)}
+.acc-body{
+  display:none;
+  border:2px solid var(--line);
+  border-top:none;
+  border-radius:0 0 20px 20px;
+  background:var(--card);
+  overflow:hidden;
+}
+.acc.open .acc-body{display:block}
+
+/* 補充リスト */
+.supply-std{
+  font-size:.8rem;
+  color:var(--green-deep);
+  font-weight:800;
+  margin-top:2px;
+}
+
+/* 完了タブ */
+.photo-banner{
+  background:linear-gradient(135deg,#F5A9B8,#F8C1CC);
+  color:#6B4450;
+  border-radius:20px;
+  padding:14px 16px;
+  margin-bottom:14px;
+  box-shadow:var(--shadow);
+}
+.photo-banner::before{content:"📸 ";font-size:1.1rem}
+.photo-banner b{color:#B04A62;font-variant-numeric:tabular-nums}
+.photo-banner p{font-size:.85rem;display:inline}
+.photo-banner .ref{display:block;font-size:.72rem;color:#8A5A66;margin-top:6px}
+textarea.notes{
+  width:100%;
+  min-height:96px;
+  padding:12px 16px;
+  font-size:.95rem;
+  font-family:var(--sans);
+  border:2.5px solid var(--line);
+  border-radius:18px;
+  background:var(--card);
+  color:var(--ink);
+  resize:vertical;
+}
+textarea.notes:focus{border-color:var(--green);outline:none}
+.report-out{
+  width:100%;
+  min-height:220px;
+  padding:12px 16px;
+  font-size:.85rem;
+  font-family:var(--sans);
+  border:2.5px solid var(--green);
+  border-radius:18px;
+  background:#FBFFF9;
+  color:var(--ink);
+  white-space:pre-wrap;
+  resize:vertical;
+}
+.btn-line{
+  display:flex;gap:10px;margin-top:12px;
+}
+.secondary-btn{
+  flex:1;
+  min-height:54px;
+  background:var(--card);
+  color:var(--green-deep);
+  border:2.5px solid var(--green);
+  border-radius:999px;
+  font-size:1rem;
+  font-weight:800;
+  box-shadow:var(--shadow);
+}
+.warn-btn{
+  width:100%;
+  min-height:54px;
+  margin-top:26px;
+  background:#FFF6F4;
+  color:var(--danger);
+  border:2.5px solid var(--danger);
+  border-radius:999px;
+  font-size:.95rem;
+  font-weight:800;
+}
+.copied-msg{
+  text-align:center;
+  font-size:.85rem;
+  color:var(--green-deep);
+  font-weight:800;
+  margin-top:8px;
+  min-height:1.4em;
+}
+
+/* 下部タブバー */
+#tabbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;
+  display:flex;
+  background:var(--card);
+  border-top:2px solid var(--line);
+  border-radius:22px 22px 0 0;
+  box-shadow:0 -3px 10px rgba(233,196,182,.35);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.tab-btn{
+  flex:1;
+  min-height:62px;
+  border:none;
+  background:transparent;
+  color:var(--ink-sub);
+  font-size:.78rem;
+  font-weight:800;
+  letter-spacing:.04em;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+}
+.tab-btn .tab-count{
+  font-size:.68rem;
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+  color:#C9B8AA;
+}
+.tab-btn.active{color:var(--green-deep)}
+.tab-btn.active::before{
+  content:"";
+  display:block;width:26px;height:5px;
+  background:var(--pink);border-radius:3px;
+  margin-bottom:2px;
+}
+.tab-btn:not(.active)::before{
+  content:"";display:block;width:26px;height:5px;background:transparent;margin-bottom:2px;
+}
+.tab-btn .tab-count.done{color:var(--pink-deep)}
+
+/* 情報モーダル */
+#infoModal{
+  position:fixed;inset:0;z-index:50;
+  background:rgba(90,74,66,.5);
+  display:flex;align-items:flex-end;justify-content:center;
+}
+#infoModal[hidden]{display:none}
+.modal-sheet{
+  width:100%;max-width:640px;
+  max-height:86vh;
+  overflow-y:auto;
+  background:var(--paper);
+  border-radius:26px 26px 0 0;
+  padding:20px 18px calc(28px + env(safe-area-inset-bottom));
+}
+.modal-title{
+  color:var(--green-deep);
+  font-size:1.1rem;
+  font-weight:800;
+  margin-bottom:12px;
+}
+.modal-title::before{content:"🦆 "}
+.modal-sec{
+  background:var(--card);
+  border:2px solid var(--line);
+  border-radius:20px;
+  padding:14px;
+  margin-bottom:14px;
+  box-shadow:var(--shadow);
+}
+.modal-sec h3{
+  font-size:.85rem;
+  color:var(--pink-deep);
+  letter-spacing:.08em;
+  margin-bottom:8px;
+}
+.modal-sec p,.modal-sec li{font-size:.88rem}
+.modal-sec ul{padding-left:1.2em;margin-top:4px}
+.modal-sec li{margin-bottom:4px}
+.contact-label{
+  font-size:.78rem;font-weight:800;color:var(--green-deep);
+  margin:10px 0 4px;
+}
+.close-btn{
+  width:100%;
+  min-height:52px;
+  background:linear-gradient(180deg,#6FBE97,#5FB08A);
+  color:#fff;
+  border:none;border-radius:999px;
+  font-size:1rem;font-weight:800;
+  box-shadow:0 4px 0 #4A9573;
+}
+/* ---------- オーバーレイ画面（履歴・設定） ---------- */
+.overlay-view{
+  position:fixed;inset:0;z-index:40;
+  background:var(--paper);
+  overflow-y:auto;
+  padding:0 0 calc(30px + env(safe-area-inset-bottom));
+}
+.overlay-view[hidden]{display:none}
+.ov-header{
+  position:sticky;top:0;z-index:5;
+  display:flex;align-items:center;gap:10px;
+  background:linear-gradient(180deg,#6FBE97,#5FB08A);color:#fff;
+  padding:12px 14px;
+  border-radius:0 0 22px 22px;
+}
+.ov-back{
+  min-height:44px;min-width:76px;
+  border:2px solid rgba(255,255,255,.7);
+  background:rgba(255,255,255,.15);color:#fff;
+  border-radius:999px;font-size:.9rem;font-weight:800;
+}
+.ov-title{font-size:1.05rem;font-weight:800;letter-spacing:.06em}
+.ov-body{max-width:640px;margin:0 auto;padding:16px 14px}
+.hist-item{
+  width:100%;text-align:left;
+  background:var(--card);
+  border:2px solid var(--line);
+  border-radius:20px;
+  padding:14px;
+  margin-bottom:10px;
+  font-family:inherit;
+  box-shadow:var(--shadow);
+}
+.hist-line1{display:flex;align-items:center;gap:8px;font-size:1rem;font-weight:800;color:var(--ink)}
+.hist-rate{
+  margin-left:auto;
+  font-size:.8rem;font-weight:800;
+  font-variant-numeric:tabular-nums;
+  color:var(--green-deep);
+  background:#E9F7EF;
+  border:2px solid var(--green);
+  padding:2px 10px;border-radius:999px;
+}
+.hist-rate.ng{color:var(--danger);background:#FFF0ED;border-color:var(--danger)}
+.hist-line2{display:block;font-size:.8rem;color:var(--ink-sub);margin-top:4px;font-weight:500}
+.empty-note{font-size:.88rem;color:var(--ink-sub);padding:10px 2px}
+.memo-input{
+  display:block;width:100%;
+  margin-top:8px;
+  padding:8px 12px;
+  font-size:.85rem;font-family:var(--sans);
+  border:2px dashed #E0C9B8;border-radius:12px;
+  background:#FFFDF8;color:var(--ink);
+}
+.memo-input:focus{border-color:var(--green);border-style:solid;outline:none}
+.mini-line{display:flex;gap:8px;margin-top:10px}
+.mini-btn{
+  flex:none;min-height:52px;padding:0 18px;
+  background:linear-gradient(180deg,#6FBE97,#5FB08A);color:#fff;
+  border:none;border-radius:999px;
+  font-size:.9rem;font-weight:800;
+  box-shadow:0 4px 0 #4A9573;
+}
+.staff-row{
+  display:flex;align-items:center;gap:10px;
+  background:#FFFDF8;
+  border:2px solid var(--line);
+  border-radius:16px;
+  padding:8px 14px;margin-bottom:8px;
+  font-size:.95rem;
+  font-weight:600;
+}
+.staff-row::before{content:"🐥"}
+.del-btn{
+  margin-left:auto;
+  min-height:40px;min-width:60px;
+  background:transparent;color:var(--danger);
+  border:2px solid var(--danger);
+  border-radius:999px;font-size:.8rem;font-weight:800;
+}
+.contact-view{font-size:.92rem;margin:2px 0 10px;word-break:break-all}
+.hint{font-size:.75rem;color:var(--ink-sub)}
+/* ---------- ボタン押下の信頼性向上 ---------- */
+button{-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.primary-btn:active,.secondary-btn:active,.warn-btn:active,.mini-btn:active,.close-btn:active,.ov-back:active,.del-btn:active,.info-btn:active{transform:scale(.96);opacity:.92}
+button[data-armed="1"]{background:var(--danger)!important;color:#fff!important;border-color:var(--danger)!important;box-shadow:none!important}
+
+/* ---------- ★かわいい演出（追加分） ---------- */
+.sparkle{
+  position:fixed;z-index:90;
+  pointer-events:none;
+  font-size:1.1rem;
+  animation:sparklefly .7s ease-out forwards;
+}
+@keyframes sparklefly{
+  0%{opacity:1;transform:translate(0,0) scale(.6)}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.3)}
+}
+#celebrate{
+  position:fixed;inset:0;z-index:80;
+  background:rgba(255,249,240,.94);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;text-align:center;padding:24px;
+}
+#celebrate[hidden]{display:none}
+#celebrate .cel-duck{font-size:4.5rem;animation:celbounce 1s ease infinite}
+@keyframes celbounce{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-18px) rotate(-6deg)}
+}
+#celebrate .cel-title{
+  font-size:1.5rem;font-weight:800;color:var(--green-deep);letter-spacing:.08em;
+}
+#celebrate .cel-sub{font-size:.95rem;color:var(--ink-sub);font-weight:600}
+#celebrate .close-btn{max-width:280px}
+.confetti{
+  position:fixed;top:-24px;z-index:81;
+  pointer-events:none;
+  font-size:1.3rem;
+  animation:confall linear forwards;
+}
+@keyframes confall{
+  0%{transform:translateY(0) rotate(0deg);opacity:1}
+  100%{transform:translateY(105vh) rotate(360deg);opacity:.8}
+}
+</style>
+</head>
+<body>
+
+<!-- ========== 開始画面 ========== -->
+<div id="startView">
+  <h1 class="brand">MUSUBIYA SAPPORO<small>清掃チェックリスト</small></h1>
+  <p class="start-lead">部屋と担当者を選んで清掃を開始してください。チェック状態は自動保存されます。</p>
+
+  <div class="field-label">清掃する部屋</div>
+  <div class="room-grid" id="roomGrid"></div>
+
+  <div class="field-label">担当者名</div>
+  <div class="room-grid" id="staffGrid" style="margin-bottom:10px"></div>
+  <input type="text" id="staffInput" class="text-input" placeholder="名簿にない場合は入力" autocomplete="off">
+  <p class="hint" style="margin-top:6px">名簿の登録・編集は「設定」からできます。</p>
+
+  <div class="field-label">清掃日</div>
+  <input type="date" id="dateInput" class="text-input">
+
+  <button id="startBtn" class="primary-btn" disabled>清掃を開始する</button>
+
+  <div class="btn-line">
+    <button class="secondary-btn" id="openHistBtn">清掃履歴</button>
+    <button class="secondary-btn" id="openSettingsBtn">設定</button>
+  </div>
+</div>
+
+<!-- ========== アプリ本体 ========== -->
+<div id="appView" hidden>
+  <header class="app-header">
+    <div class="hdr-top">
+      <div class="hdr-brand">MUSUBIYA <span class="hdr-session" id="sessionInfo"></span></div>
+      <button class="info-btn" id="infoBtn" aria-label="基本方針と連絡先">i</button>
+    </div>
+    <div class="progress-wrap">
+      <span id="duckRunner" aria-hidden="true">🦆</span>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-num" id="progressNum">0/74（0%）</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel" id="panel-flow"></section>
+    <section class="panel" id="panel-area" hidden></section>
+    <section class="panel" id="panel-supply" hidden></section>
+    <section class="panel" id="panel-final" hidden></section>
+  </main>
+
+  <nav id="tabbar">
+    <button class="tab-btn active" data-tab="flow">フロー<span class="tab-count" id="cnt-flow"></span></button>
+    <button class="tab-btn" data-tab="area">エリア別<span class="tab-count" id="cnt-area"></span></button>
+    <button class="tab-btn" data-tab="supply">補充<span class="tab-count" id="cnt-supply"></span></button>
+    <button class="tab-btn" data-tab="final">完了<span class="tab-count" id="cnt-final"></span></button>
+  </nav>
+</div>
+
+<!-- ========== 清掃履歴 ========== -->
+<div class="overlay-view" id="historyView" hidden>
+  <div class="ov-header">
+    <button class="ov-back" id="histBackBtn">‹ 戻る</button>
+    <div class="ov-title">清掃履歴</div>
+  </div>
+  <div class="ov-body">
+    <div id="histList"></div>
+    <div id="histDetail" hidden>
+      <button class="secondary-btn" id="histToListBtn" style="width:100%;margin-bottom:12px">‹ 一覧に戻る</button>
+      <div class="sec-head"><span class="sec-title" id="histDetailTitle"></span></div>
+      <p class="sec-note" id="histDetailMeta"></p>
+      <textarea class="report-out" id="histDetailReport" readonly></textarea>
+      <div class="btn-line">
+        <button class="secondary-btn" id="histCopyBtn">コピー</button>
+        <button class="secondary-btn" id="histDeleteBtn" style="color:var(--danger);border-color:var(--danger)">削除</button>
+      </div>
+      <div class="copied-msg" id="histCopyMsg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 設定 ========== -->
+<div class="overlay-view" id="settingsView" hidden>
+  <div class="ov-header">
+    <button class="ov-back" id="settingsBackBtn">‹ 戻る</button>
+    <div class="ov-title">設定</div>
+  </div>
+  <div class="ov-body">
+    <div class="modal-sec">
+      <h3>担当者名簿</h3>
+      <p class="hint">開始画面で選択できる担当者名を登録します。実名はここから追加してください。</p>
+      <div id="staffList" style="margin-top:10px"></div>
+      <div class="mini-line">
+        <input type="text" id="staffAddInput" class="text-input" placeholder="名前を入力" autocomplete="off" style="flex:1">
+        <button class="mini-btn" id="staffAddBtn">追加</button>
+      </div>
+      <div class="copied-msg" id="staffMsg" style="text-align:left;min-height:1.2em"></div>
+    </div>
+    <div class="modal-sec">
+      <h3>連絡先</h3>
+      <div class="contact-label">運営者連絡先（LINE / 電話）</div>
+      <input type="text" id="contact1" class="text-input" placeholder="未設定（タップして入力）">
+      <div class="contact-label">緊急駆けつけ対応窓口</div>
+      <input type="text" id="contact2" class="text-input" placeholder="未設定（タップして入力）">
+      <p class="hint" style="margin-top:8px">保存は自動です。この端末のブラウザ内に保存されます。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 情報モーダル ========== -->
+<div id="infoModal" hidden>
+  <div class="modal-sheet">
+    <div class="modal-title">基本方針・連絡先</div>
+    <div class="modal-sec" id="policySec"></div>
+    <div class="modal-sec">
+      <h3>トラブル発生時</h3>
+      <p id="troubleText"></p>
+      <div class="contact-label">運営者連絡先（LINE / 電話）</div>
+      <div class="contact-view" id="contactView1">未設定</div>
+      <div class="contact-label">緊急駆けつけ対応窓口</div>
+      <div class="contact-view" id="contactView2">未設定</div>
+      <p class="hint">連絡先の変更は「設定」から行えます。</p>
+    </div>
+    <div class="btn-line" style="margin:0 0 14px">
+      <button class="secondary-btn" id="modalHistBtn">清掃履歴</button>
+      <button class="secondary-btn" id="modalSettingsBtn">設定</button>
+    </div>
+    <button class="warn-btn" id="resetBtn" style="margin-top:4px;margin-bottom:14px">この清掃をリセットして開始画面に戻る</button>
+    <button class="close-btn" id="closeModalBtn">閉じる</button>
+  </div>
+</div>
+
+<!-- ========== ★お祝い画面 ========== -->
+<div id="celebrate" hidden>
+  <div class="cel-duck">🦆</div>
+  <div class="cel-title">ぜんぶ完了！えらい！</div>
+  <div class="cel-sub">おつかれさまでした🌸<br>完了タブの報告テキストをコピーしてね</div>
+  <button class="close-btn" id="celebrateCloseBtn">とじる</button>
+</div>
+
+<script>
+/* =====================================================
+   MUSUBIYA SAPPORO 清掃チェックリストアプリ
+   データファイル（フェーズ①：データのみ）
+   作成日: 2026-07-07
+   出典: 清掃マニュアル（全室共通版）4ページ分を転記
+   更新: 2026-07-08 運営者フィードバック7件を反映（v1.1）
+   更新: 2026-07-08 「飲料水・ウェルカムアメニティ」を補充リストから削除（v1.2）
+   更新: 2026-07-08 「ハンドソープ」に食器用洗剤を統合（v1.3）
+   更新: 2026-07-08 「飲料水・ウェルカムアメニティ」を再追加（v1.4／v1.2で削除したものを復活）
+   更新: 2026-07-08 品名を「ウェルカムアメニティ」に変更（飲料水を除外）（v1.5）
+   更新: 2026-07-08 洗面所「庫内に生乾き臭が...槽洗浄を実施」の項目を削除（v1.6）
+   更新: 2026-07-08 玄関「靴・傘立てを整理」→「傘が折れていないか確認し、床を拭く」に変更（v1.7）
+   更新: 2026-07-08 玄関に「スリッパ裏面を拭く」を追加（v1.8）
+   更新: 2026-07-10 UIをかわいい系テーマに変更（v1.8k）
+   更新: 2026-07-10 「報告テキストを作成」ボタンを廃止。
+     報告テキストは完了タブに常時表示・チェックに連動して自動更新。
+     コピー／履歴に保存ボタンはそのまま利用可能
+   ===================================================== */
+
+const CLEANING_DATA = {
+
+  meta: {
+    title: "MUSUBIYA SAPPORO 清掃マニュアル（全室共通版）",
+    dataVersion: "1.8k",
+    createdAt: "2026-07-07",
+    updatedAt: "2026-07-10",
+    rooms: ["波部屋", "桜部屋", "富士部屋", "桜2号", "紅葉部屋", "ジブリ部屋"]
+  },
+
+  policy: {
+    purpose: "ゲストが到着した瞬間に「気持ちいい」と感じる清潔さを、毎回同じ品質で再現することが目的です。",
+    rules: [
+      "見た目のきれいさだけでなく、匂い・水回りの水滴・髪の毛の取り残しに注意する",
+      "チェックリストは自己判断で省略せず、上から順に実施する"
+    ]
+  },
+
+  phases: [
+    { id: "prep",    name: "準備",     colorHint: "#FDF1E3" },
+    { id: "laundry", name: "洗濯",     colorHint: "#FCE7EC" },
+    { id: "water",   name: "水回り",   colorHint: "#E3F2FA" },
+    { id: "floor",   name: "床・ホコリ", colorHint: "#FBF3D9" },
+    { id: "finish",  name: "仕上げ",   colorHint: "#EFE8F8" },
+    { id: "leaving", name: "退室前",   colorHint: "#E7F5EA" }
+  ],
+
+  flow: [
+    { id: "flow-01", no: 1,  phaseId: "prep",
+      task: "窓を開けて換気し、センサーライトを取り外して充電する",
+      point: "" },
+    { id: "flow-02", no: 2,  phaseId: "prep",
+      task: "清掃前（ビフォー）の状態を10枚撮影し、LINEグループに送信",
+      point: "清掃開始の合図" },
+    { id: "flow-03", no: 3,  phaseId: "laundry",
+      task: "クッション・ソファの匂いを確認する",
+      point: "匂いがあればファブリーズ（乾く時間が必要なため早めに実施）。汚れがあれば洗濯" },
+    { id: "flow-04", no: 4,  phaseId: "laundry",
+      task: "ベッドリネンをすべて外して洗濯（お急ぎコース）",
+      point: "終わり次第、バスタオル等も続けて洗濯" },
+    { id: "flow-05", no: 5,  phaseId: "water",
+      task: "お風呂・洗面所を掃除する",
+      point: "拭き上げは使用済みバスタオルを使用。アメニティ残量を確認",
+      relatedAreas: ["bathroom", "washroom"] },
+    { id: "flow-06", no: 6,  phaseId: "water",
+      task: "キッチンを掃除する",
+      point: "拭き上げはタオルを使用",
+      relatedAreas: ["kitchen"] },
+    { id: "flow-07", no: 7,  phaseId: "water",
+      task: "トイレを掃除する",
+      point: "ゴム手袋を着用",
+      relatedAreas: ["toilet"] },
+    { id: "flow-08", no: 8,  phaseId: "floor",
+      task: "フロアワイパー（パタパタ）で上から順にホコリを落とす",
+      point: "エアコンフィルターも忘れずに" },
+    { id: "flow-09", no: 9,  phaseId: "floor",
+      task: "掃除機をかける",
+      point: "ソファ・ラグにこぼした跡がないか確認" },
+    { id: "flow-10", no: 10, phaseId: "finish",
+      task: "コロコロをかけながらベッドメイキングする",
+      point: "ファブリーズをかけながら引っ張るとシワが伸びやすい" },
+    { id: "flow-11", no: 11, phaseId: "finish",
+      task: "床を拭き、鏡の手垢をチェックする",
+      point: "" },
+    { id: "flow-12", no: 12, phaseId: "finish",
+      task: "テレビ・冷房の動作確認",
+      point: "アカウントのログアウト確認" },
+    { id: "flow-13", no: 13, phaseId: "finish",
+      task: "アメニティを並べる",
+      point: "",
+      relatedSection: "amenities" },
+    { id: "flow-14", no: 14, phaseId: "leaving",
+      task: "玄関を掃除する",
+      point: "",
+      relatedAreas: ["entrance"] },
+    { id: "flow-15", no: 15, phaseId: "leaving",
+      task: "マンションのゴミ捨て場にゴミを出す",
+      point: "周囲に配慮し、目立たないように捨てる" },
+    { id: "flow-16", no: 16, phaseId: "leaving",
+      task: "写真撮影ルールに従って撮影し、LINEグループのアルバムにアップロード",
+      point: "最低50枚を目安に。詳細は5章参照",
+      relatedSection: "photoRules" }
+  ],
+
+  extraNote: "余裕がある場合：窓・窓のサン・ベランダにゴミや汚れが溜まっていたら、あわせて清掃してください。",
+
+  areaChecklists: [
+    {
+      id: "kitchen",
+      name: "3-1. キッチン",
+      colorHint: "#B7E0C8",
+      items: [
+        { id: "kit-01", text: "シンク・蛇口の水垢と水滴を拭き取り、曇りがない状態にする" },
+        { id: "kit-02", text: "コンロ・電子レンジ・冷蔵庫の庫内外を清掃し、油汚れがないか確認" },
+        { id: "kit-03", text: "食器・カトラリー・調理器具を洗浄し、指定の場所に収納" },
+        { id: "kit-04", text: "ゴミ箱を空にして新しい袋をセット" },
+        { id: "kit-05", text: "ケトル・トースターなど小物家電の汚れ・水垢を確認" }
+      ]
+    },
+    {
+      id: "living_bedroom",
+      name: "3-2. リビング・寝室",
+      colorHint: "#CBE6B8",
+      items: [
+        { id: "liv-01", text: "床（フローリング・ラグ）の掃除機がけ、髪の毛・ホコリの取り残しがないか確認" },
+        { id: "liv-02", text: "テーブル・棚・家電のホコリ拭き" },
+        { id: "liv-03", text: "寝具（シーツ・枕カバー・掛け布団カバー）をすべて新品に交換" },
+        { id: "liv-04", text: "マットレス・枕に汚れやシミがないか確認" },
+        { id: "liv-05", text: "カーテンの開閉確認、照明・エアコンの動作確認" },
+        { id: "liv-06", text: "テレビの動作確認、Netflix等のアカウントがログアウトされているか確認" },
+        { id: "liv-07", text: "ゴミ箱を空にして新しい袋をセット" }
+      ]
+    },
+    {
+      id: "bathroom",
+      name: "3-3. バスルーム",
+      colorHint: "#B8D9F0",
+      items: [
+        { id: "bat-01", text: "浴槽・壁面の水垢・カビの有無を確認し清掃" },
+        { id: "bat-02", text: "排水口の髪の毛・ゴミを除去" },
+        { id: "bat-03", text: "鏡・蛇口を曇りなく磨く" },
+        { id: "bat-04", text: "バスマット・タオル類を新品に交換" },
+        { id: "bat-05", text: "シャンプー・ボディソープ等の残量確認、残量30%以下で補充" },
+        { id: "bat-06", text: "ボトルの口を全て正面向きに揃える" }
+      ]
+    },
+    {
+      id: "washroom",
+      name: "3-4. 洗面所",
+      colorHint: "#C5D4F2",
+      items: [
+        { id: "was-01", text: "洗面ボウル・蛇口の水垢を拭き取り、曇りなく磨く" },
+        { id: "was-02", text: "鏡の水垢・指紋を確認し磨く" },
+        { id: "was-03", text: "排水口の髪の毛・ゴミを除去" },
+        { id: "was-04", text: "洗面台下・収納棚の忘れ物確認、整理" },
+        { id: "was-05", text: "ハンドソープ・タオルの残量確認、補充" },
+        { id: "was-06", text: "洗濯乾燥機のフィルター（糸くずフィルター・乾燥フィルター）のホコリを毎回除去" },
+        { id: "was-07", text: "洗濯槽内・パッキン部分の髪の毛やゴミ、カビ臭がないか確認" },
+        { id: "was-08", text: "洗剤の残量確認、補充" },
+        { id: "was-10", text: "洗濯洗剤のラベルを正面向きに揃える" },
+        { id: "was-11", text: "洗濯終了後は槽乾燥を実施（乾燥運転中のまま退室してOK）" }
+      ]
+    },
+    {
+      id: "toilet",
+      name: "3-5. トイレ",
+      colorHint: "#F0D9B8",
+      items: [
+        { id: "toi-01", text: "便器内外・便座裏を清掃し、匂いの有無を確認" },
+        { id: "toi-02", text: "床・壁の飛び散り跡を確認" },
+        { id: "toi-03", text: "トイレットペーパーの残量確認、予備を規定数セット" },
+        { id: "toi-04", text: "手洗い場の水滴・石鹸残量を確認" },
+        { id: "toi-05", text: "ゴミ箱を空にして新しい袋をセット" }
+      ]
+    },
+    {
+      id: "entrance",
+      name: "3-6. 玄関・共用部",
+      colorHint: "#E0CBEA",
+      items: [
+        { id: "ent-01", text: "玄関の傘が折れていないか確認し、床を拭く" },
+        { id: "ent-02", text: "スマートロック・鍵の動作確認" },
+        { id: "ent-03", text: "案内表示（Wi-Fi情報・ハウスルール等）が所定の場所にあるか確認" },
+        { id: "ent-04", text: "共用廊下・ゴミ置き場周辺のゴミ・私物がないか確認" },
+        { id: "ent-05", text: "スリッパ裏面を拭く" }
+      ]
+    }
+  ],
+
+  amenities: [
+    { id: "amn-01", item: "トイレットペーパー",
+      standard: "予備2ロール", rule: "残り1ロール以下で補充" },
+    { id: "amn-02", item: "シャンプー/コンディショナー/ボディソープ",
+      standard: "各1本", rule: "残量30%以下で補充" },
+    { id: "amn-03", item: "ハンドソープ・食器用洗剤",
+      standard: "各1本", rule: "残量30%以下で補充" },
+    { id: "amn-04", item: "バスタオル",
+      standard: "人数分", rule: "使用済みは必ず新品と交換" },
+    { id: "amn-05", item: "フェイスタオル",
+      standard: "人数分＋2", rule: "使用済みは必ず新品と交換" },
+    { id: "amn-06", item: "歯ブラシセット",
+      standard: "人数分", rule: "未開封のみ次のゲストへ回す。開封済みは新品に交換" },
+    { id: "amn-07", item: "ゴミ袋（キッチン/リビング/トイレ）",
+      standard: "各予備2枚", rule: "セット済みゴミ箱に予備を常備" },
+    { id: "amn-08", item: "ウェルカムアメニティ",
+      standard: "規定数", rule: "備品リストに準じて補充" }
+  ],
+
+  photoRules: {
+    description: "清掃完了後は下記の順番でエリアごとに撮影し、LINEグループのアルバムにアップロードしてください。枚数は最低50枚を目安に、隅々まで確認できるよう撮影してください。",
+    beforePhotoCount: 10,
+    minPhotoCount: 50,
+    reference: "",
+    shootingOrder: [
+      { id: "pht-01", text: "キッチン全体・シンク周り・冷蔵庫内" },
+      { id: "pht-02", text: "リビング・寝室（ベッドメイク後の状態が分かるアングル）" },
+      { id: "pht-03", text: "バスルーム・トイレ（清掃後の水回り）" },
+      { id: "pht-04", text: "玄関・アメニティ補充後の設置状態" },
+      { id: "pht-05", text: "破損・汚損箇所を発見した場合は、通常撮影に加えて該当箇所を必ず撮影し報告に添付" }
+    ]
+  },
+
+  finalCheck: [
+    { id: "fin-01", text: "忘れ物・破損・異臭がない" },
+    { id: "fin-02", text: "全室の照明・エアコン・鍵が正常動作" },
+    { id: "fin-03", text: "寝具・タオル類がすべて新品交換済み" },
+    { id: "fin-04", text: "アメニティ・消耗品が規定数補充済み" },
+    { id: "fin-05", text: "ゴミがすべて回収され新しい袋がセット済み" },
+    { id: "fin-06", text: "写真をLINEグループアルバムに送信・報告フォーム送信が完了" },
+    { id: "fin-07", text: "リネン庫が施錠済みか確認" }
+  ],
+
+  trouble: {
+    instruction: "破損・異臭・水漏れ・鍵の不具合など、清掃中に通常と異なる状況を発見した場合は清掃作業を中断し、速やかに運営者へ連絡してください。",
+    contacts: [
+      { id: "ctc-01", label: "運営者連絡先（LINE / 電話）", value: "" },
+      { id: "ctc-02", label: "緊急駆けつけ対応窓口", value: "" }
+    ],
+    note: "連絡先欄は各拠点の最新情報に差し替えてご利用ください。"
+  }
+};
+
+/* =====================================================
+   アプリ本体ロジック
+   ===================================================== */
+(function(){
+"use strict";
+const D = CLEANING_DATA;
+const LS_SESSION  = "musubiya_session_v1";
+const LS_CONTACTS = "musubiya_contacts_v1";
+const LS_STAFF    = "musubiya_staff_v1";
+
+const $  = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+
+/* --- 状態 --- */
+let state = null; // {room, staff, date, checks:{}, notes:"", finalMemos:{}}
+
+function loadSession(){
+  try{ const raw = localStorage.getItem(LS_SESSION); return raw ? JSON.parse(raw) : null; }
+  catch(e){ return null; }
+}
+function saveSession(){
+  try{ localStorage.setItem(LS_SESSION, JSON.stringify(state)); }catch(e){}
+}
+
+/* --- セクション定義（進捗計算用） --- */
+const SEC = {
+  flow:   D.flow.map(f => f.id),
+  area:   D.areaChecklists.flatMap(a => a.items.map(i => i.id)),
+  supply: D.amenities.map(a => a.id),
+  final:  D.photoRules.shootingOrder.map(p => p.id).concat(D.finalCheck.map(f => f.id))
+};
+const TOTAL = SEC.flow.length + SEC.area.length + SEC.supply.length + SEC.final.length;
+
+function doneIn(ids){ return ids.filter(id => state.checks[id]).length; }
+
+/* --- 日付ユーティリティ（日本標準時基準） --- */
+function todayJST(){
+  return new Date(Date.now() + 9*3600*1000).toISOString().slice(0,10);
+}
+function fmtDate(d){
+  if(!d) return "";
+  const p = d.split("-").map(Number);
+  const w = ["日","月","火","水","木","金","土"][new Date(p[0], p[1]-1, p[2]).getDay()];
+  return p[0] + "/" + p[1] + "/" + p[2] + "（" + w + "）";
+}
+const CIRCLED = n => String.fromCharCode(0x245F + n); /* ①〜⑯ */
+
+/* ============ 開始画面 ============ */
+let selRoom = null;
+let selStaff = null;
+function initStart(){
+  const grid = $("#roomGrid");
+  grid.innerHTML = "";
+  D.meta.rooms.forEach(r => {
+    const b = document.createElement("button");
+    b.className = "room-btn";
+    b.textContent = r;
+    b.addEventListener("click", () => {
+      selRoom = r;
+      $$("#roomGrid .room-btn").forEach(x => x.classList.toggle("sel", x === b));
+      checkStartReady();
+    });
+    grid.appendChild(b);
+  });
+  renderStaffGrid();
+  $("#dateInput").value = todayJST();
+  if(!$("#staffInput").dataset.bound){
+    $("#staffInput").dataset.bound = "1";
+    $("#staffInput").addEventListener("input", () => {
+      if($("#staffInput").value.trim()){
+        selStaff = null;
+        $$("#staffGrid .room-btn").forEach(x => x.classList.remove("sel"));
+      }
+      checkStartReady();
+    });
+  }
+  checkStartReady();
+}
+function renderStaffGrid(){
+  const sg = $("#staffGrid");
+  if(!sg) return;
+  const list = loadStaffList();
+  const last = localStorage.getItem(LS_STAFF) || "";
+  sg.innerHTML = "";
+  sg.style.display = list.length ? "" : "none";
+  selStaff = null;
+  list.forEach(name => {
+    const b = document.createElement("button");
+    b.className = "room-btn";
+    b.textContent = name;
+    b.addEventListener("click", () => {
+      selStaff = name;
+      $("#staffInput").value = "";
+      $$("#staffGrid .room-btn").forEach(x => x.classList.toggle("sel", x === b));
+      checkStartReady();
+    });
+    sg.appendChild(b);
+    if(name === last){ selStaff = name; b.classList.add("sel"); }
+  });
+  $("#staffInput").value = (list.length && list.indexOf(last) !== -1) ? "" : last;
+  checkStartReady();
+}
+function getStaffValue(){
+  const typed = $("#staffInput").value.trim();
+  return typed || selStaff || "";
+}
+function checkStartReady(){
+  const btn = $("#startBtn");
+  if(btn) btn.disabled = !(selRoom && getStaffValue());
+}
+$("#startBtn").addEventListener("click", () => {
+  const staff = getStaffValue();
+  try{ localStorage.setItem(LS_STAFF, staff); }catch(e){}
+  state = { room: selRoom, staff: staff, date: $("#dateInput").value || todayJST(), checks:{}, notes:"", finalMemos:{} };
+  saveSession();
+  showApp();
+});
+
+/* ============ 描画 ============ */
+function rowHTML(id, band, inner){
+  return '<div class="row" role="checkbox" tabindex="0" aria-checked="false" data-id="' + id + '"'
+    + ' style="--band:' + (band || "transparent") + '">'
+    + '<span class="chk" aria-hidden="true"></span>'
+    + '<span class="row-body">' + inner + '</span></div>';
+}
+
+function renderFlow(){
+  let html = "";
+  D.phases.forEach(ph => {
+    const steps = D.flow.filter(f => f.phaseId === ph.id);
+    if(!steps.length) return;
+    html += '<div class="sec-head"><span class="sec-title">' + ph.name + '</span>'
+          + '<span class="sec-count" data-phase="' + ph.id + '"></span></div>';
+    html += '<div class="card">';
+    steps.forEach(f => {
+      let inner = '<span class="row-no">' + CIRCLED(f.no) + '</span>'
+                + '<span class="row-text">' + f.task + '</span>';
+      if(f.point) inner += '<span class="row-point">' + f.point + '</span>';
+      if(f.relatedAreas) inner += '<span class="jump-chip" data-jump="' + f.relatedAreas.join(",") + '">チェック詳細を見る →</span>';
+      if(f.relatedSection === "amenities")  inner += '<span class="jump-chip" data-jumptab="supply">補充リストを見る →</span>';
+      if(f.relatedSection === "photoRules") inner += '<span class="jump-chip" data-jumptab="final">撮影ルールを見る →</span>';
+      html += rowHTML(f.id, ph.colorHint, inner);
+    });
+    html += '</div>';
+  });
+  html += '<p class="sec-note" style="margin-top:14px">' + D.extraNote + '</p>';
+  $("#panel-flow").innerHTML = html;
+}
+
+function renderArea(){
+  let html = '<div class="sec-head"><span class="sec-title">エリア別チェックリスト</span></div>'
+           + '<p class="sec-note">見出しをタップで開閉します。自己判断で省略せず、上から順に実施してください。</p>';
+  D.areaChecklists.forEach(a => {
+    html += '<div class="acc" id="acc-' + a.id + '">'
+          + '<button class="acc-head" style="background:' + a.colorHint + '" data-acc="' + a.id + '">'
+          + a.name
+          + '<span class="acc-count" data-areacnt="' + a.id + '"></span>'
+          + '<span class="acc-arrow">▼</span></button>'
+          + '<div class="acc-body">';
+    a.items.forEach(it => {
+      html += rowHTML(it.id, a.colorHint, '<span class="row-text">' + it.text + '</span>');
+    });
+    html += '</div></div>';
+  });
+  $("#panel-area").innerHTML = html;
+}
+
+function renderSupply(){
+  let html = '<div class="sec-head"><span class="sec-title">アメニティ・消耗品 補充</span>'
+           + '<span class="sec-count" id="supplyCnt"></span></div>'
+           + '<p class="sec-note">補充・確認が終わった品目にチェックしてください。</p><div class="card">';
+  D.amenities.forEach(a => {
+    html += rowHTML(a.id, "#B7E0C8",
+        '<span class="row-text">' + a.item + '</span>'
+      + '<span class="supply-std">目安：' + a.standard + '</span>'
+      + '<span class="row-point">' + a.rule + '</span>');
+  });
+  html += '</div>';
+  $("#panel-supply").innerHTML = html;
+}
+
+function renderFinal(){
+  let html = '<div class="photo-banner">'
+    + '<p>清掃前ビフォー <b>' + D.photoRules.beforePhotoCount + '枚</b>／完了後 <b>最低' + D.photoRules.minPhotoCount + '枚</b> を目安に撮影し、LINEグループのアルバムへアップロードしてください。</p>'
+    + (D.photoRules.reference ? '<p class="ref">' + D.photoRules.reference + '</p>' : '') + '</div>';
+
+  html += '<div class="sec-head"><span class="sec-title">撮影の順番</span><span class="sec-count" id="photoCnt"></span></div><div class="card">';
+  D.photoRules.shootingOrder.forEach((p, i) => {
+    html += rowHTML(p.id, "#B8D9F0", '<span class="row-no">' + (i+1) + '.</span><span class="row-text">' + p.text + '</span>');
+  });
+  html += '</div>';
+
+  html += '<div class="sec-head"><span class="sec-title">最終確認</span><span class="sec-count" id="finalCnt"></span></div><div class="card">';
+  D.finalCheck.forEach(f => {
+    html += rowHTML(f.id, "#F5A9B8",
+        '<span class="row-text">' + f.text + '</span>'
+      + '<input class="memo-input" data-memo="' + f.id + '" placeholder="備考（任意）" autocomplete="off">');
+  });
+  html += '</div>';
+
+  html += '<div class="sec-head"><span class="sec-title">特記事項（破損・汚損・気づき）</span></div>'
+    + '<textarea class="notes" id="notesArea" placeholder="例：洗面台に小さな欠けあり。該当箇所を撮影しアルバムに追加済み。"></textarea>';
+
+  html += '<div class="sec-head"><span class="sec-title">報告テキスト（自動作成）</span></div>'
+    + '<div class="copied-msg" id="warnMsg" style="color:var(--danger)"></div>'
+    + '<textarea class="report-out" id="reportOut" readonly></textarea>'
+    + '<div class="btn-line">'
+    + '<button class="secondary-btn" id="copyBtn">コピー</button>'
+    + '<button class="secondary-btn" id="saveHistBtn">履歴に保存</button></div>'
+    + '<div class="copied-msg" id="copyMsg"></div>'
+    + '<button class="warn-btn" id="newCleanBtn">この清掃を終了して新しい清掃を開始</button>';
+
+  $("#panel-final").innerHTML = html;
+
+  $("#notesArea").addEventListener("input", e => { state.notes = e.target.value; saveSession(); refreshReport(); });
+  $("#copyBtn").addEventListener("click", copyReport);
+  $("#saveHistBtn").addEventListener("click", saveHistoryRecord);
+  $("#newCleanBtn").addEventListener("click", resetToStart);
+  $$("#panel-final .memo-input").forEach(inp => {
+    inp.value = (state.finalMemos && state.finalMemos[inp.dataset.memo]) || "";
+    inp.addEventListener("input", () => {
+      if(!state.finalMemos) state.finalMemos = {};
+      state.finalMemos[inp.dataset.memo] = inp.value;
+      saveSession();
+      refreshReport();
+    });
+  });
+  refreshReport();
+}
+
+/* ============ 操作 ============ */
+document.addEventListener("click", e => {
+  if(e.target.closest("input,textarea")) return;
+  const chip = e.target.closest(".jump-chip");
+  if(chip){
+    e.stopPropagation();
+    if(chip.dataset.jumptab){
+      switchTab(chip.dataset.jumptab);
+    } else if(chip.dataset.jump){
+      switchTab("area");
+      const ids = chip.dataset.jump.split(",");
+      ids.forEach(id => {
+        const acc = document.getElementById("acc-" + id);
+        if(acc) acc.classList.add("open");
+      });
+      const target = document.getElementById("acc-" + ids[0]);
+      if(target) setTimeout(() => target.scrollIntoView({behavior:"smooth", block:"start"}), 80);
+    }
+    return;
+  }
+  const accHead = e.target.closest(".acc-head");
+  if(accHead){ accHead.parentElement.classList.toggle("open"); return; }
+  const row = e.target.closest(".row");
+  if(row && row.dataset.id){ toggleCheck(row.dataset.id); }
+});
+document.addEventListener("keydown", e => {
+  if((e.key === " " || e.key === "Enter") && e.target.classList && e.target.classList.contains("row")){
+    e.preventDefault();
+    toggleCheck(e.target.dataset.id);
+  }
+});
+
+function toggleCheck(id){
+  if(!state) return;
+  if(state.checks[id]) delete state.checks[id];
+  else state.checks[id] = true;
+  saveSession();
+  updateUI();
+}
+
+function switchTab(name){
+  $$(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
+  ["flow","area","supply","final"].forEach(t => {
+    $("#panel-" + t).hidden = (t !== name);
+  });
+  window.scrollTo({top:0});
+}
+$$(".tab-btn").forEach(b => b.addEventListener("click", () => switchTab(b.dataset.tab)));
+
+/* ============ 進捗表示 ============ */
+function setCnt(sel, ids){
+  const el = $(sel);
+  const d = doneIn(ids);
+  el.textContent = d + "/" + ids.length;
+  el.classList.toggle("done", d === ids.length);
+}
+function updateUI(){
+  $$(".row[data-id]").forEach(r => {
+    r.setAttribute("aria-checked", state.checks[r.dataset.id] ? "true" : "false");
+  });
+  const done = doneIn(SEC.flow) + doneIn(SEC.area) + doneIn(SEC.supply) + doneIn(SEC.final);
+  const pct = Math.round(done / TOTAL * 100);
+  $("#progressFill").style.width = pct + "%";
+  $("#progressNum").textContent = done + "/" + TOTAL + "（" + pct + "%）";
+
+  setCnt("#cnt-flow", SEC.flow);
+  setCnt("#cnt-area", SEC.area);
+  setCnt("#cnt-supply", SEC.supply);
+  setCnt("#cnt-final", SEC.final);
+
+  D.phases.forEach(ph => {
+    const ids = D.flow.filter(f => f.phaseId === ph.id).map(f => f.id);
+    const el = document.querySelector('[data-phase="' + ph.id + '"]');
+    if(el) el.textContent = doneIn(ids) + " / " + ids.length;
+  });
+  D.areaChecklists.forEach(a => {
+    const ids = a.items.map(i => i.id);
+    const el = document.querySelector('[data-areacnt="' + a.id + '"]');
+    if(el) el.textContent = doneIn(ids) + "/" + ids.length;
+  });
+  const sc = $("#supplyCnt"); if(sc) sc.textContent = doneIn(SEC.supply) + " / " + SEC.supply.length;
+  const phIds = D.photoRules.shootingOrder.map(p => p.id);
+  const fiIds = D.finalCheck.map(f => f.id);
+  const pc = $("#photoCnt"); if(pc) pc.textContent = doneIn(phIds) + " / " + phIds.length;
+  const fc = $("#finalCnt"); if(fc) fc.textContent = doneIn(fiIds) + " / " + fiIds.length;
+  refreshReport();
+}
+
+/* ============ 報告テキスト（常時表示・自動更新） ============ */
+function uncheckedList(){
+  const out = [];
+  D.flow.forEach(f => { if(!state.checks[f.id]) out.push("・" + CIRCLED(f.no) + " " + f.task); });
+  D.areaChecklists.forEach(a => {
+    const label = a.name.replace(/^3-\d+\.\s*/, "");
+    a.items.forEach(it => { if(!state.checks[it.id]) out.push("・[" + label + "] " + it.text); });
+  });
+  D.amenities.forEach(am => { if(!state.checks[am.id]) out.push("・[補充] " + am.item); });
+  D.photoRules.shootingOrder.forEach(p => { if(!state.checks[p.id]) out.push("・[写真] " + p.text); });
+  D.finalCheck.forEach(f => { if(!state.checks[f.id]) out.push("・[最終確認] " + f.text); });
+  return out;
+}
+function buildReportText(){
+  const u = uncheckedList();
+  const L = [];
+  L.push("【清掃完了報告】MUSUBIYA SAPPORO");
+  L.push("部屋：" + state.room);
+  L.push("日付：" + fmtDate(state.date));
+  L.push("担当：" + state.staff);
+  L.push("");
+  L.push("▼チェック状況");
+  L.push("・全体フロー：" + doneIn(SEC.flow) + "/" + SEC.flow.length);
+  L.push("・エリア別：" + doneIn(SEC.area) + "/" + SEC.area.length);
+  L.push("・アメニティ補充：" + doneIn(SEC.supply) + "/" + SEC.supply.length);
+  L.push("・写真手順・最終確認：" + doneIn(SEC.final) + "/" + SEC.final.length);
+  L.push("");
+  if(u.length){
+    L.push("▼未完了（" + u.length + "件）");
+    u.forEach(x => L.push(x));
+    L.push("");
+  }
+  const memoLines = [];
+  D.finalCheck.forEach(f => {
+    const mv = state.finalMemos && state.finalMemos[f.id] ? state.finalMemos[f.id].trim() : "";
+    if(mv) memoLines.push("・" + f.text + "：" + mv);
+  });
+  if(memoLines.length){
+    L.push("▼最終確認の備考");
+    memoLines.forEach(x => L.push(x));
+    L.push("");
+  }
+  L.push("▼特記事項");
+  L.push(state.notes && state.notes.trim() ? state.notes.trim() : "なし");
+  L.push("");
+  L.push("写真：ビフォー" + D.photoRules.beforePhotoCount + "枚／完了後" + D.photoRules.minPhotoCount + "枚目安（LINEアルバムにアップ済み）");
+  return L.join("\n");
+}
+function refreshReport(){
+  const out = $("#reportOut");
+  if(!out || !state) return;
+  out.value = buildReportText();
+  const w = $("#warnMsg");
+  if(w){
+    const u = uncheckedList();
+    w.textContent = u.length ? "⚠ 未完了が" + u.length + "件あります。内容を確認してください。" : "✅ 全項目完了です。";
+  }
+}
+function copyReport(){
+  const text = $("#reportOut").value;
+  const ok = () => { $("#copyMsg").textContent = "コピーしました。LINEに貼り付けてください。"; };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(ok).catch(() => fallbackCopy(text, ok));
+  } else {
+    fallbackCopy(text, ok);
+  }
+}
+function fallbackCopy(text, cb){
+  const out = $("#reportOut");
+  out.focus();
+  out.select();
+  try{ document.execCommand("copy"); cb(); }
+  catch(e){ $("#copyMsg").textContent = "自動コピーできませんでした。長押しで全選択してコピーしてください。"; }
+}
+
+/* ============ リセット・モーダル ============ */
+function armConfirm(btn, armedText, action){
+  if(!btn) return;
+  if(btn.dataset.armed === "1"){
+    btn.dataset.armed = "";
+    action();
+    return;
+  }
+  btn.dataset.armed = "1";
+  const orig = btn.textContent;
+  btn.textContent = armedText;
+  setTimeout(() => {
+    if(btn.dataset.armed === "1"){
+      btn.dataset.armed = "";
+      btn.textContent = orig;
+    }
+  }, 4000);
+}
+function resetToStart(e){
+  const btn = (e && e.currentTarget) ? e.currentTarget : $("#resetBtn");
+  armConfirm(btn, "もう一度タップで実行（チェック消去）", () => {
+    try{ localStorage.removeItem(LS_SESSION); }catch(err){}
+    state = null;
+    $("#infoModal").hidden = true;
+    $("#historyView").hidden = true;
+    $("#settingsView").hidden = true;
+    $("#appView").hidden = true;
+    $("#startView").style.display = "";
+    selRoom = null;
+    initStart();
+    window.scrollTo({top:0});
+  });
+}
+$("#infoBtn").addEventListener("click", () => { $("#infoModal").hidden = false; });
+$("#closeModalBtn").addEventListener("click", () => { $("#infoModal").hidden = true; });
+$("#infoModal").addEventListener("click", e => { if(e.target.id === "infoModal") $("#infoModal").hidden = true; });
+$("#resetBtn").addEventListener("click", resetToStart);
+
+function renderPolicy(){
+  $("#policySec").innerHTML =
+    '<h3>清掃の基本方針</h3><p>' + D.policy.purpose + '</p><ul>'
+    + D.policy.rules.map(r => '<li>' + r + '</li>').join("")
+    + '</ul>';
+  $("#troubleText").textContent = D.trouble.instruction;
+}
+function initContacts(){
+  let c = { c1:"", c2:"" };
+  try{ c = Object.assign(c, JSON.parse(localStorage.getItem(LS_CONTACTS) || "{}")); }catch(e){}
+  $("#contact1").value = c.c1;
+  $("#contact2").value = c.c2;
+  const save = () => {
+    try{
+      localStorage.setItem(LS_CONTACTS, JSON.stringify({ c1: $("#contact1").value, c2: $("#contact2").value }));
+    }catch(e){}
+    refreshContactView();
+  };
+  $("#contact1").addEventListener("input", save);
+  $("#contact2").addEventListener("input", save);
+  refreshContactView();
+}
+function refreshContactView(){
+  const v1 = $("#contact1").value.trim();
+  const v2 = $("#contact2").value.trim();
+  $("#contactView1").textContent = v1 || "未設定";
+  $("#contactView2").textContent = v2 || "未設定";
+}
+
+/* ============ 清掃履歴 ============ */
+const LS_HISTORY   = "musubiya_history_v1";
+const LS_STAFFLIST = "musubiya_stafflist_v1";
+let histCurrentId = null;
+
+function loadHistory(){
+  try{ return JSON.parse(localStorage.getItem(LS_HISTORY) || "[]"); }catch(e){ return []; }
+}
+function saveHistory(arr){
+  try{ localStorage.setItem(LS_HISTORY, JSON.stringify(arr)); }catch(e){}
+}
+function saveHistoryRecord(){
+  if(!state) return;
+  const done = doneIn(SEC.flow) + doneIn(SEC.area) + doneIn(SEC.supply) + doneIn(SEC.final);
+  const rec = {
+    id: Date.now(),
+    savedAt: new Date(Date.now() + 9*3600*1000).toISOString().slice(0,16).replace("T", " "),
+    room: state.room,
+    date: state.date,
+    staff: state.staff,
+    done: done,
+    total: TOTAL,
+    report: buildReportText()
+  };
+  const arr = loadHistory();
+  arr.unshift(rec);
+  saveHistory(arr);
+  const sb = $("#saveHistBtn");
+  if(sb){ sb.disabled = true; sb.textContent = "保存済み"; }
+  $("#copyMsg").textContent = "履歴に保存しました（この端末内の記録です）。";
+}
+function renderHistList(){
+  const arr = loadHistory();
+  const list = $("#histList");
+  $("#histDetail").hidden = true;
+  list.hidden = false;
+  if(!arr.length){
+    list.innerHTML = '<p class="empty-note">保存された履歴はまだありません。完了タブの「履歴に保存」を押すと記録されます。</p>';
+    return;
+  }
+  list.innerHTML = arr.map(r => {
+    const pct = Math.round(r.done / r.total * 100);
+    return '<button class="hist-item" data-hist="' + r.id + '">'
+      + '<span class="hist-line1">' + r.room
+      + '<span class="hist-rate' + (pct < 100 ? " ng" : "") + '">' + r.done + '/' + r.total + '（' + pct + '%）</span></span>'
+      + '<span class="hist-line2">' + fmtDate(r.date) + '・' + r.staff + '　保存：' + r.savedAt + '</span>'
+      + '</button>';
+  }).join("");
+}
+function openHistDetail(id){
+  const rec = loadHistory().find(r => String(r.id) === String(id));
+  if(!rec) return;
+  histCurrentId = rec.id;
+  $("#histList").hidden = true;
+  $("#histDetail").hidden = false;
+  $("#histDetailTitle").textContent = rec.room;
+  $("#histDetailMeta").textContent = fmtDate(rec.date) + "・" + rec.staff + "・" + rec.done + "/" + rec.total + "　保存：" + rec.savedAt;
+  $("#histDetailReport").value = rec.report || "";
+  $("#histCopyMsg").textContent = "";
+}
+function deleteHistRecord(e){
+  if(histCurrentId == null) return;
+  const btn = (e && e.currentTarget) ? e.currentTarget : $("#histDeleteBtn");
+  armConfirm(btn, "もう一度タップで削除", () => {
+    saveHistory(loadHistory().filter(r => String(r.id) !== String(histCurrentId)));
+    histCurrentId = null;
+    renderHistList();
+  });
+}
+$("#histList").addEventListener("click", e => {
+  const item = e.target.closest(".hist-item");
+  if(item) openHistDetail(item.dataset.hist);
+});
+$("#histToListBtn").addEventListener("click", renderHistList);
+$("#histDeleteBtn").addEventListener("click", deleteHistRecord);
+$("#histCopyBtn").addEventListener("click", () => {
+  const ta = $("#histDetailReport");
+  const ok = () => { $("#histCopyMsg").textContent = "コピーしました。"; };
+  const fb = () => {
+    ta.focus(); ta.select();
+    try{ document.execCommand("copy"); ok(); }
+    catch(err){ $("#histCopyMsg").textContent = "長押しで全選択してコピーしてください。"; }
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(ta.value).then(ok).catch(fb);
+  } else { fb(); }
+});
+
+/* ============ 設定（担当者名簿） ============ */
+function loadStaffList(){
+  try{ return JSON.parse(localStorage.getItem(LS_STAFFLIST) || "[]"); }catch(e){ return []; }
+}
+function saveStaffList(arr){
+  try{ localStorage.setItem(LS_STAFFLIST, JSON.stringify(arr)); }catch(e){}
+}
+function renderStaffSettings(){
+  const arr = loadStaffList();
+  $("#staffList").innerHTML = arr.length
+    ? arr.map((n, i) => '<div class="staff-row">' + n + '<button class="del-btn" data-delstaff="' + i + '">削除</button></div>').join("")
+    : '<p class="empty-note">まだ登録がありません。下の欄から追加してください。</p>';
+}
+function staffMsg(t){
+  const el = $("#staffMsg");
+  if(!el) return;
+  el.textContent = t;
+  setTimeout(() => { if(el.textContent === t) el.textContent = ""; }, 3000);
+}
+$("#staffAddBtn").addEventListener("click", () => {
+  const v = $("#staffAddInput").value.trim();
+  if(!v) return;
+  const arr = loadStaffList();
+  if(arr.indexOf(v) !== -1){ staffMsg("同じ名前がすでに登録されています"); return; }
+  arr.push(v);
+  saveStaffList(arr);
+  $("#staffAddInput").value = "";
+  renderStaffSettings();
+  renderStaffGrid();
+  staffMsg("「" + v + "」を追加しました");
+});
+$("#staffList").addEventListener("click", e => {
+  const d = e.target.closest("[data-delstaff]");
+  if(!d) return;
+  armConfirm(d, "確定", () => {
+    const arr = loadStaffList();
+    arr.splice(Number(d.dataset.delstaff), 1);
+    saveStaffList(arr);
+    renderStaffSettings();
+    renderStaffGrid();
+  });
+});
+
+/* ============ 履歴・設定画面の開閉 ============ */
+function openHistory(){ renderHistList(); $("#historyView").hidden = false; }
+function openSettings(){ renderStaffSettings(); $("#settingsView").hidden = false; }
+$("#openHistBtn").addEventListener("click", openHistory);
+$("#openSettingsBtn").addEventListener("click", openSettings);
+$("#histBackBtn").addEventListener("click", () => { $("#historyView").hidden = true; });
+$("#settingsBackBtn").addEventListener("click", () => { $("#settingsView").hidden = true; });
+$("#modalHistBtn").addEventListener("click", () => { $("#infoModal").hidden = true; openHistory(); });
+$("#modalSettingsBtn").addEventListener("click", () => { $("#infoModal").hidden = true; openSettings(); });
+
+/* ============ 起動 ============ */
+function showApp(){
+  $("#startView").style.display = "none";
+  $("#appView").hidden = false;
+  switchTab("flow");
+  $("#sessionInfo").textContent = "｜" + state.room + "・" + fmtDate(state.date) + "・" + state.staff;
+  renderFlow();
+  renderArea();
+  renderSupply();
+  renderFinal();
+  $("#notesArea").value = state.notes || "";
+  updateUI();
+}
+
+renderPolicy();
+initContacts();
+const existing = loadSession();
+if(existing && existing.room){
+  state = existing;
+  state.checks = state.checks || {};
+  state.notes = state.notes || "";
+  state.finalMemos = state.finalMemos || {};
+  showApp();
+} else {
+  initStart();
+}
+})();
+
+/* =====================================================
+   ★かわいい演出レイヤー（本体ロジックとは独立）
+   - チェックON時：タップ位置からキラキラ♪が弾ける
+   - チェックON時：ヘッダーのカモがぴょこっと跳ねる
+   - 進捗100%到達時：カモのお祝い画面＋紙吹雪（1清掃につき1回）
+   ===================================================== */
+(function(){
+"use strict";
+const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const EMOJIS = ["✨","♪","🌸","⭐","💮"];
+let celebrated = false;
+
+function spawnSparkles(x, y){
+  if(reduceMotion) return;
+  for(let i = 0; i < 6; i++){
+    const s = document.createElement("span");
+    s.className = "sparkle";
+    s.textContent = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+    s.style.left = (x - 8) + "px";
+    s.style.top = (y - 8) + "px";
+    const ang = Math.random() * Math.PI * 2;
+    const dist = 34 + Math.random() * 36;
+    s.style.setProperty("--dx", Math.cos(ang) * dist + "px");
+    s.style.setProperty("--dy", (Math.sin(ang) * dist - 26) + "px");
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 750);
+  }
+}
+function hopDuck(){
+  const d = document.getElementById("duckRunner");
+  if(!d || reduceMotion) return;
+  d.classList.remove("hop");
+  void d.offsetWidth;
+  d.classList.add("hop");
+}
+function dropConfetti(){
+  if(reduceMotion) return;
+  const C = ["🌸","✨","🎀","⭐","💛","💚"];
+  for(let i = 0; i < 24; i++){
+    const c = document.createElement("span");
+    c.className = "confetti";
+    c.textContent = C[Math.floor(Math.random() * C.length)];
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.animationDuration = (2 + Math.random() * 2.2) + "s";
+    c.style.animationDelay = (Math.random() * .8) + "s";
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 5200);
+  }
+}
+function showCelebrate(){
+  const el = document.getElementById("celebrate");
+  if(!el) return;
+  el.hidden = false;
+  dropConfetti();
+}
+document.getElementById("celebrateCloseBtn").addEventListener("click", () => {
+  document.getElementById("celebrate").hidden = true;
+});
+
+/* チェックON検知：クリック後にaria-checkedを確認 */
+document.addEventListener("click", e => {
+  const row = e.target.closest(".row");
+  if(!row || !row.dataset.id) return;
+  if(e.target.closest(".jump-chip") || e.target.closest("input,textarea")) return;
+  setTimeout(() => {
+    if(row.getAttribute("aria-checked") === "true"){
+      spawnSparkles(e.clientX || 60, e.clientY || 120);
+      hopDuck();
+    }
+  }, 0);
+});
+
+/* 100%到達検知：進捗表示テキストを監視 */
+const numEl = document.getElementById("progressNum");
+if(numEl && window.MutationObserver){
+  new MutationObserver(() => {
+    const t = numEl.textContent || "";
+    if(t.indexOf("（100%）") !== -1){
+      if(!celebrated){ celebrated = true; showCelebrate(); }
+    } else {
+      celebrated = false;
+    }
+  }).observe(numEl, { childList: true, characterData: true, subtree: true });
+}
+})();
+</script>
+</body>
+</html>
