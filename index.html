@@ -299,9 +299,15 @@ main{max-width:640px;margin:0 auto;padding:14px 12px 20px}
 }
 .row-point{
   display:block;
-  font-size:.78rem;
-  color:var(--ink-sub);
-  margin-top:3px;
+  font-size:1.05rem;
+  font-weight:800;
+  color:#C84B2B;
+  background:#FFF3EE;
+  border-left:3px solid #E86B4A;
+  padding:6px 10px;
+  margin-top:6px;
+  border-radius:4px;
+  line-height:1.5;
 }
 .jump-chip{
   display:inline-block;
@@ -314,6 +320,18 @@ main{max-width:640px;margin:0 auto;padding:14px 12px 20px}
   border:2px solid var(--green);
   border-radius:999px;
 }
+
+/* フロー内の詳細チェック展開 */
+.exp-body{background:#FFFDF8;border-bottom:2px dotted var(--line)}
+.exp-body[hidden]{display:none}
+.exp-title{
+  font-size:.8rem;font-weight:800;color:var(--green-deep);
+  padding:12px 14px 2px 20px;
+}
+.exp-body .row{min-height:50px;padding:10px 14px 10px 26px}
+.exp-body .chk{width:28px;height:28px}
+.exp-body .row[aria-checked="true"] .chk::after{left:8px;top:4px;width:7px;height:12px}
+.exp-body .row-text{font-size:.9rem}
 
 /* アコーディオン（エリア別） */
 .acc{margin-bottom:12px}
@@ -709,21 +727,19 @@ button[data-armed="1"]{background:var(--danger)!important;color:#fff!important;b
     <div class="progress-wrap">
       <span id="duckRunner" aria-hidden="true">🦆</span>
       <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-      <div class="progress-num" id="progressNum">0/74（0%）</div>
+      <div class="progress-num" id="progressNum">0/67（0%）</div>
     </div>
   </header>
 
   <main>
     <section class="panel" id="panel-flow"></section>
     <section class="panel" id="panel-area" hidden></section>
-    <section class="panel" id="panel-supply" hidden></section>
     <section class="panel" id="panel-final" hidden></section>
   </main>
 
   <nav id="tabbar">
     <button class="tab-btn active" data-tab="flow">フロー<span class="tab-count" id="cnt-flow"></span></button>
     <button class="tab-btn" data-tab="area">エリア別<span class="tab-count" id="cnt-area"></span></button>
-    <button class="tab-btn" data-tab="supply">補充<span class="tab-count" id="cnt-supply"></span></button>
     <button class="tab-btn" data-tab="final">完了<span class="tab-count" id="cnt-final"></span></button>
   </nav>
 </div>
@@ -827,13 +843,19 @@ button[data-armed="1"]{background:var(--danger)!important;color:#fff!important;b
    更新: 2026-07-10 「報告テキストを作成」ボタンを廃止。
      報告テキストは完了タブに常時表示・チェックに連動して自動更新。
      コピー／履歴に保存ボタンはそのまま利用可能
+   更新: 2026-07-10 トイレ「手洗い場の水滴・石鹸残量を確認」→「ブルーレットの残量」に変更
+   更新: 2026-07-16 補足テキストを見やすく（v1.9m）
+     ・補充目安は各エリアの該当項目下に補足表示する方式に変更
+     ・キッチンに「食器用洗剤の残量確認」を追加
+     ・歯ブラシは洗面所、ウェルカムアメニティはフロー⑬の補足に記載
+     ・フローの「チェック詳細」はタブ移動せずその場で開閉できるように変更
    ===================================================== */
 
 const CLEANING_DATA = {
 
   meta: {
     title: "MUSUBIYA SAPPORO 清掃マニュアル（全室共通版）",
-    dataVersion: "1.8k",
+    dataVersion: "1.9k",
     createdAt: "2026-07-07",
     updatedAt: "2026-07-10",
     rooms: ["波部屋", "桜部屋", "富士部屋", "桜2号", "紅葉部屋", "ジブリ部屋"]
@@ -898,8 +920,7 @@ const CLEANING_DATA = {
       point: "アカウントのログアウト確認" },
     { id: "flow-13", no: 13, phaseId: "finish",
       task: "アメニティを並べる",
-      point: "",
-      relatedSection: "amenities" },
+      point: "ウェルカムアメニティは備品リストに準じて規定数を補充" },
     { id: "flow-14", no: 14, phaseId: "leaving",
       task: "玄関を掃除する",
       point: "",
@@ -924,8 +945,9 @@ const CLEANING_DATA = {
         { id: "kit-01", text: "シンク・蛇口の水垢と水滴を拭き取り、曇りがない状態にする" },
         { id: "kit-02", text: "コンロ・電子レンジ・冷蔵庫の庫内外を清掃し、油汚れがないか確認" },
         { id: "kit-03", text: "食器・カトラリー・調理器具を洗浄し、指定の場所に収納" },
-        { id: "kit-04", text: "ゴミ箱を空にして新しい袋をセット" },
-        { id: "kit-05", text: "ケトル・トースターなど小物家電の汚れ・水垢を確認" }
+        { id: "kit-04", text: "ゴミ箱を空にして新しい袋をセット", point: "補充目安：ゴミ袋の予備2枚を常備" },
+        { id: "kit-05", text: "ケトル・トースターなど小物家電の汚れ・水垢を確認" },
+        { id: "kit-06", text: "食器用洗剤の残量確認", point: "補充目安：1本（残量30%以下で補充）" }
       ]
     },
     {
@@ -939,7 +961,7 @@ const CLEANING_DATA = {
         { id: "liv-04", text: "マットレス・枕に汚れやシミがないか確認" },
         { id: "liv-05", text: "カーテンの開閉確認、照明・エアコンの動作確認" },
         { id: "liv-06", text: "テレビの動作確認、Netflix等のアカウントがログアウトされているか確認" },
-        { id: "liv-07", text: "ゴミ箱を空にして新しい袋をセット" }
+        { id: "liv-07", text: "ゴミ箱を空にして新しい袋をセット", point: "補充目安：ゴミ袋の予備2枚を常備" }
       ]
     },
     {
@@ -950,8 +972,8 @@ const CLEANING_DATA = {
         { id: "bat-01", text: "浴槽・壁面の水垢・カビの有無を確認し清掃" },
         { id: "bat-02", text: "排水口の髪の毛・ゴミを除去" },
         { id: "bat-03", text: "鏡・蛇口を曇りなく磨く" },
-        { id: "bat-04", text: "バスマット・タオル類を新品に交換" },
-        { id: "bat-05", text: "シャンプー・ボディソープ等の残量確認、残量30%以下で補充" },
+        { id: "bat-04", text: "バスマット・タオル類を新品に交換", point: "補充目安：バスタオル人数分／フェイスタオル人数分＋2（使用済みは必ず新品と交換）" },
+        { id: "bat-05", text: "シャンプー・ボディソープ等の残量確認、残量30%以下で補充", point: "補充目安：各1本" },
         { id: "bat-06", text: "ボトルの口を全て正面向きに揃える" }
       ]
     },
@@ -964,7 +986,7 @@ const CLEANING_DATA = {
         { id: "was-02", text: "鏡の水垢・指紋を確認し磨く" },
         { id: "was-03", text: "排水口の髪の毛・ゴミを除去" },
         { id: "was-04", text: "洗面台下・収納棚の忘れ物確認、整理" },
-        { id: "was-05", text: "ハンドソープ・タオルの残量確認、補充" },
+        { id: "was-05", text: "ハンドソープ・タオルの残量確認、補充", point: "補充目安：ハンドソープ1本（残量30%以下で補充）・歯ブラシセット人数分（未開封のみ次のゲストへ、開封済みは新品交換）" },
         { id: "was-06", text: "洗濯乾燥機のフィルター（糸くずフィルター・乾燥フィルター）のホコリを毎回除去" },
         { id: "was-07", text: "洗濯槽内・パッキン部分の髪の毛やゴミ、カビ臭がないか確認" },
         { id: "was-08", text: "洗剤の残量確認、補充" },
@@ -979,9 +1001,9 @@ const CLEANING_DATA = {
       items: [
         { id: "toi-01", text: "便器内外・便座裏を清掃し、匂いの有無を確認" },
         { id: "toi-02", text: "床・壁の飛び散り跡を確認" },
-        { id: "toi-03", text: "トイレットペーパーの残量確認、予備を規定数セット" },
-        { id: "toi-04", text: "手洗い場の水滴・石鹸残量を確認" },
-        { id: "toi-05", text: "ゴミ箱を空にして新しい袋をセット" }
+        { id: "toi-03", text: "トイレットペーパーの残量確認、予備を規定数セット", point: "補充目安：予備2ロール（残り1ロール以下で補充）" },
+        { id: "toi-04", text: "手洗い場の水滴・ブルーレットの残量を確認" },
+        { id: "toi-05", text: "ゴミ箱を空にして新しい袋をセット", point: "補充目安：ゴミ袋の予備2枚を常備" }
       ]
     },
     {
@@ -998,6 +1020,8 @@ const CLEANING_DATA = {
     }
   ],
 
+  /* v1.9k以降このリストは画面に表示されません（補充目安は各エリア項目のpointに転記済み）。
+     元マニュアルの記録として残しています。 */
   amenities: [
     { id: "amn-01", item: "トイレットペーパー",
       standard: "予備2ロール", rule: "残り1ロール以下で補充" },
@@ -1079,10 +1103,9 @@ function saveSession(){
 const SEC = {
   flow:   D.flow.map(f => f.id),
   area:   D.areaChecklists.flatMap(a => a.items.map(i => i.id)),
-  supply: D.amenities.map(a => a.id),
   final:  D.photoRules.shootingOrder.map(p => p.id).concat(D.finalCheck.map(f => f.id))
 };
-const TOTAL = SEC.flow.length + SEC.area.length + SEC.supply.length + SEC.final.length;
+const TOTAL = SEC.flow.length + SEC.area.length + SEC.final.length;
 
 function doneIn(ids){ return ids.filter(id => state.checks[id]).length; }
 
@@ -1177,6 +1200,11 @@ function rowHTML(id, band, inner){
     + '<span class="row-body">' + inner + '</span></div>';
 }
 
+function areaRowInner(it){
+  return '<span class="row-text">' + it.text + '</span>'
+    + (it.point ? '<span class="row-point">' + it.point + '</span>' : '');
+}
+
 function renderFlow(){
   let html = "";
   D.phases.forEach(ph => {
@@ -1189,10 +1217,20 @@ function renderFlow(){
       let inner = '<span class="row-no">' + CIRCLED(f.no) + '</span>'
                 + '<span class="row-text">' + f.task + '</span>';
       if(f.point) inner += '<span class="row-point">' + f.point + '</span>';
-      if(f.relatedAreas) inner += '<span class="jump-chip" data-jump="' + f.relatedAreas.join(",") + '">チェック詳細を見る →</span>';
-      if(f.relatedSection === "amenities")  inner += '<span class="jump-chip" data-jumptab="supply">補充リストを見る →</span>';
+      if(f.relatedAreas) inner += '<span class="jump-chip" data-expand="exp-' + f.id + '">チェック詳細を開く ▼</span>';
       if(f.relatedSection === "photoRules") inner += '<span class="jump-chip" data-jumptab="final">撮影ルールを見る →</span>';
       html += rowHTML(f.id, ph.colorHint, inner);
+      if(f.relatedAreas){
+        html += '<div class="exp-body" id="exp-' + f.id + '" hidden>';
+        f.relatedAreas.forEach(aid => {
+          const a = D.areaChecklists.find(x => x.id === aid);
+          if(!a) return;
+          html += '<div class="exp-title">' + a.name.replace(/^3-\d+\.\s*/, "")
+                + '　<span class="sec-count" data-areacnt="' + a.id + '"></span></div>';
+          a.items.forEach(it => { html += rowHTML(it.id, a.colorHint, areaRowInner(it)); });
+        });
+        html += '</div>';
+      }
     });
     html += '</div>';
   });
@@ -1211,25 +1249,11 @@ function renderArea(){
           + '<span class="acc-arrow">▼</span></button>'
           + '<div class="acc-body">';
     a.items.forEach(it => {
-      html += rowHTML(it.id, a.colorHint, '<span class="row-text">' + it.text + '</span>');
+      html += rowHTML(it.id, a.colorHint, areaRowInner(it));
     });
     html += '</div></div>';
   });
   $("#panel-area").innerHTML = html;
-}
-
-function renderSupply(){
-  let html = '<div class="sec-head"><span class="sec-title">アメニティ・消耗品 補充</span>'
-           + '<span class="sec-count" id="supplyCnt"></span></div>'
-           + '<p class="sec-note">補充・確認が終わった品目にチェックしてください。</p><div class="card">';
-  D.amenities.forEach(a => {
-    html += rowHTML(a.id, "#B7E0C8",
-        '<span class="row-text">' + a.item + '</span>'
-      + '<span class="supply-std">目安：' + a.standard + '</span>'
-      + '<span class="row-point">' + a.rule + '</span>');
-  });
-  html += '</div>';
-  $("#panel-supply").innerHTML = html;
 }
 
 function renderFinal(){
@@ -1290,15 +1314,12 @@ document.addEventListener("click", e => {
     e.stopPropagation();
     if(chip.dataset.jumptab){
       switchTab(chip.dataset.jumptab);
-    } else if(chip.dataset.jump){
-      switchTab("area");
-      const ids = chip.dataset.jump.split(",");
-      ids.forEach(id => {
-        const acc = document.getElementById("acc-" + id);
-        if(acc) acc.classList.add("open");
-      });
-      const target = document.getElementById("acc-" + ids[0]);
-      if(target) setTimeout(() => target.scrollIntoView({behavior:"smooth", block:"start"}), 80);
+    } else if(chip.dataset.expand){
+      const body = document.getElementById(chip.dataset.expand);
+      if(body){
+        body.hidden = !body.hidden;
+        chip.textContent = body.hidden ? "チェック詳細を開く ▼" : "チェック詳細を閉じる ▲";
+      }
     }
     return;
   }
@@ -1324,7 +1345,7 @@ function toggleCheck(id){
 
 function switchTab(name){
   $$(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
-  ["flow","area","supply","final"].forEach(t => {
+  ["flow","area","final"].forEach(t => {
     $("#panel-" + t).hidden = (t !== name);
   });
   window.scrollTo({top:0});
@@ -1342,14 +1363,13 @@ function updateUI(){
   $$(".row[data-id]").forEach(r => {
     r.setAttribute("aria-checked", state.checks[r.dataset.id] ? "true" : "false");
   });
-  const done = doneIn(SEC.flow) + doneIn(SEC.area) + doneIn(SEC.supply) + doneIn(SEC.final);
+  const done = doneIn(SEC.flow) + doneIn(SEC.area) + doneIn(SEC.final);
   const pct = Math.round(done / TOTAL * 100);
   $("#progressFill").style.width = pct + "%";
   $("#progressNum").textContent = done + "/" + TOTAL + "（" + pct + "%）";
 
   setCnt("#cnt-flow", SEC.flow);
   setCnt("#cnt-area", SEC.area);
-  setCnt("#cnt-supply", SEC.supply);
   setCnt("#cnt-final", SEC.final);
 
   D.phases.forEach(ph => {
@@ -1359,10 +1379,10 @@ function updateUI(){
   });
   D.areaChecklists.forEach(a => {
     const ids = a.items.map(i => i.id);
-    const el = document.querySelector('[data-areacnt="' + a.id + '"]');
-    if(el) el.textContent = doneIn(ids) + "/" + ids.length;
+    document.querySelectorAll('[data-areacnt="' + a.id + '"]').forEach(el => {
+      el.textContent = doneIn(ids) + "/" + ids.length;
+    });
   });
-  const sc = $("#supplyCnt"); if(sc) sc.textContent = doneIn(SEC.supply) + " / " + SEC.supply.length;
   const phIds = D.photoRules.shootingOrder.map(p => p.id);
   const fiIds = D.finalCheck.map(f => f.id);
   const pc = $("#photoCnt"); if(pc) pc.textContent = doneIn(phIds) + " / " + phIds.length;
@@ -1378,7 +1398,6 @@ function uncheckedList(){
     const label = a.name.replace(/^3-\d+\.\s*/, "");
     a.items.forEach(it => { if(!state.checks[it.id]) out.push("・[" + label + "] " + it.text); });
   });
-  D.amenities.forEach(am => { if(!state.checks[am.id]) out.push("・[補充] " + am.item); });
   D.photoRules.shootingOrder.forEach(p => { if(!state.checks[p.id]) out.push("・[写真] " + p.text); });
   D.finalCheck.forEach(f => { if(!state.checks[f.id]) out.push("・[最終確認] " + f.text); });
   return out;
@@ -1394,7 +1413,6 @@ function buildReportText(){
   L.push("▼チェック状況");
   L.push("・全体フロー：" + doneIn(SEC.flow) + "/" + SEC.flow.length);
   L.push("・エリア別：" + doneIn(SEC.area) + "/" + SEC.area.length);
-  L.push("・アメニティ補充：" + doneIn(SEC.supply) + "/" + SEC.supply.length);
   L.push("・写真手順・最終確認：" + doneIn(SEC.final) + "/" + SEC.final.length);
   L.push("");
   if(u.length){
@@ -1545,7 +1563,7 @@ function saveHistory(arr){
 }
 function saveHistoryRecord(){
   if(!state) return;
-  const done = doneIn(SEC.flow) + doneIn(SEC.area) + doneIn(SEC.supply) + doneIn(SEC.final);
+  const done = doneIn(SEC.flow) + doneIn(SEC.area) + doneIn(SEC.final);
   const rec = {
     id: Date.now(),
     savedAt: new Date(Date.now() + 9*3600*1000).toISOString().slice(0,16).replace("T", " "),
@@ -1681,7 +1699,6 @@ function showApp(){
   $("#sessionInfo").textContent = "｜" + state.room + "・" + fmtDate(state.date) + "・" + state.staff;
   renderFlow();
   renderArea();
-  renderSupply();
   renderFinal();
   $("#notesArea").value = state.notes || "";
   updateUI();
