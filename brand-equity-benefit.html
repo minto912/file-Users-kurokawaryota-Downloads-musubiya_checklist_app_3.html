@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ブランドエクイティ &amp; ベネフィット</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Hiragino Sans','Yu Gothic',sans-serif;
+  background:#F8FAFB;
+  min-height:100vh;
+  padding:24px 16px;
+  line-height:1.6;
+}
+
+.card{
+  max-width:600px;
+  margin:0 auto 40px;
+  background:#fff;
+  border-radius:20px;
+  padding:24px 20px;
+  box-shadow:0 4px 20px rgba(0,0,0,.08);
+}
+
+.card-header{text-align:center;margin-bottom:24px}
+.badge{
+  display:inline-block;
+  font-size:12px;font-weight:700;
+  padding:4px 12px;border-radius:20px;
+  margin-bottom:8px;
+}
+.badge-teal{background:#E6F7F7;color:#007A7B}
+.badge-orange{background:#FFF0E6;color:#E07020}
+
+.card-header h2{
+  font-size:20px;color:#0D3D3E;font-weight:800;
+}
+.card-header p{
+  margin-top:6px;font-size:12px;color:#7AA8A9;
+}
+
+/* --- Pyramid --- */
+.pyramid{
+  display:flex;flex-direction:column;
+  gap:6px;align-items:center;
+}
+.pyramid-tier{
+  border-radius:12px;padding:12px 16px;
+  text-align:center;
+}
+.tier-emoji{font-size:20px;margin-bottom:2px}
+.tier-title{font-size:15px;font-weight:800;margin-bottom:2px}
+.tier-sub{font-size:10px;font-weight:600;margin-bottom:4px}
+.tier-desc{font-size:11px;opacity:.85;line-height:1.5}
+
+.arrow-label{
+  display:flex;align-items:center;
+  justify-content:center;gap:8px;
+  margin-top:16px;
+}
+.arrow-label span{font-size:11px;color:#7AA8A9}
+.arrow-label .icon{font-size:16px}
+
+.example-box{
+  margin-top:16px;background:#F0FAFA;
+  border-radius:12px;padding:12px 14px;
+  font-size:12px;color:#4A7A7B;line-height:1.8;
+}
+.example-box strong{color:#007A7B}
+
+/* --- Merit vs Benefit --- */
+.compare{
+  display:flex;gap:12px;align-items:stretch;
+}
+.compare-col{
+  flex:1;border-radius:14px;
+  padding:16px 14px;text-align:center;
+  border-width:2px;border-style:solid;
+}
+.col-merit{background:#F0F4FF;border-color:#C8D4FF}
+.col-benefit{background:#FFF5E6;border-color:#FFCF99}
+
+.col-emoji{font-size:28px;margin-bottom:8px}
+.col-badge{
+  color:#fff;font-size:13px;font-weight:800;
+  padding:4px 12px;border-radius:20px;
+  display:inline-block;margin-bottom:12px;
+}
+.col-badge-merit{background:#6B7FD4}
+.col-badge-benefit{background:#E07020}
+
+.col-desc{font-size:11px;margin-bottom:12px;line-height:1.6}
+.col-merit .col-desc{color:#5A6A9A}
+.col-benefit .col-desc{color:#8A5A20}
+
+.col-examples{
+  background:#fff;border-radius:10px;
+  padding:10px;font-size:12px;line-height:1.8;
+  border-width:1px;border-style:solid;
+}
+.col-merit .col-examples{color:#3A4A7A;border-color:#C8D4FF}
+.col-benefit .col-examples{color:#5A3010;border-color:#FFCF99}
+
+.col-reaction{
+  margin-top:10px;font-size:11px;
+  border-radius:8px;padding:6px 8px;
+}
+.col-merit .col-reaction{color:#8A9ACA;background:#E8ECFF}
+.col-benefit .col-reaction{color:#A07030;background:#FFE8C0}
+
+.compare-arrow{
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:4px;padding:0 4px;
+}
+.compare-arrow .vert{
+  font-size:11px;color:#7AA8A9;
+  writing-mode:vertical-rl;text-orientation:mixed;
+}
+.compare-arrow .horiz{font-size:24px}
+
+.key-msg{
+  margin-top:16px;background:#0D3D3E;
+  border-radius:12px;padding:14px 16px;
+  text-align:center;
+}
+.key-msg .title{
+  font-size:14px;font-weight:800;
+  color:#fff;margin-bottom:4px;
+}
+.key-msg .body{
+  font-size:12px;color:#7DD8D9;line-height:1.7;
+}
+
+@media(max-width:420px){
+  .compare{flex-direction:column}
+  .compare-arrow{flex-direction:row;padding:4px 0}
+  .compare-arrow .vert{writing-mode:horizontal-tb}
+}
+</style>
+</head>
+<body>
+
+<!-- ========== 図1: ブランドエクイティピラミッド ========== -->
+<div class="card">
+  <div class="card-header">
+    <div class="badge badge-teal">図1</div>
+    <h2>ブランドエクイティピラミッド</h2>
+    <p>「ただ知ってる」から「大ファン」になるまでの4段階</p>
+  </div>
+
+  <div class="pyramid">
+    <div class="pyramid-tier" style="width:40%;background:#0D3D3E">
+      <div class="tier-emoji">⭐</div>
+      <div class="tier-title" style="color:#fff">これしか選ばない！</div>
+      <div class="tier-sub" style="color:#7DD8D9">Resonance（共鳴）</div>
+      <div class="tier-desc" style="color:#fff">もはや大ファン。友達にも勧めちゃう</div>
+    </div>
+    <div class="pyramid-tier" style="width:60%;background:#00A4A6">
+      <div class="tier-emoji">💛</div>
+      <div class="tier-title" style="color:#fff">好き！信頼してる</div>
+      <div class="tier-sub" style="color:#B2ECEC">Feelings / Judgments</div>
+      <div class="tier-desc" style="color:#fff">「なんか好き」「信頼できる」という感情</div>
+    </div>
+    <div class="pyramid-tier" style="width:80%;background:#5CC8C9">
+      <div class="tier-emoji">👀</div>
+      <div class="tier-title" style="color:#fff">どんなブランドか知ってる</div>
+      <div class="tier-sub" style="color:#E0F7F7">Performance / Imagery</div>
+      <div class="tier-desc" style="color:#fff">品質・デザイン・イメージがわかってる状態</div>
+    </div>
+    <div class="pyramid-tier" style="width:100%;background:#B2E8E9">
+      <div class="tier-emoji">🙋</div>
+      <div class="tier-title" style="color:#0D3D3E">名前は知ってる</div>
+      <div class="tier-sub" style="color:#007A7B">Salience（認知）</div>
+      <div class="tier-desc" style="color:#0D3D3E">「あ、聞いたことある！」というレベル</div>
+    </div>
+  </div>
+
+  <div class="arrow-label">
+    <span>下から積み上げていく</span>
+    <span class="icon">⬆️</span>
+    <span>上ほど強い絆</span>
+  </div>
+
+  <div class="example-box">
+    <strong>📱 スマホで例えると</strong><br>
+    🙋 「iPhoneって聞いたことある」<br>
+    👀 「おしゃれでカメラが良いやつでしょ」<br>
+    💛 「やっぱりiPhoneが好き！使いやすい！」<br>
+    ⭐ 「iPhone以外ありえない。みんなにも勧めてる」
+  </div>
+</div>
+
+<!-- ========== 図2: メリット vs ベネフィット ========== -->
+<div class="card" style="margin-bottom:0">
+  <div class="card-header">
+    <div class="badge badge-orange">図2</div>
+    <h2>メリット vs ベネフィット</h2>
+    <p>売れる言葉はどっち？</p>
+  </div>
+
+  <div class="compare">
+    <div class="compare-col col-merit">
+      <div class="col-emoji">📦</div>
+      <div class="col-badge col-badge-merit">メリット</div>
+      <div class="col-desc">
+        商品・サービス自体の<br>
+        <strong>「特徴・機能」</strong>
+      </div>
+      <div class="col-examples">
+        「重さ500g」<br>
+        「バッテリー24時間」<br>
+        「防水対応」
+      </div>
+      <div class="col-reaction">
+        😐 へぇ、そうなんだ…<br>（だから何？ってなりがち）
+      </div>
+    </div>
+
+    <div class="compare-arrow">
+      <span class="vert">これが</span>
+      <span class="horiz">→</span>
+      <span class="vert">こうなる</span>
+    </div>
+
+    <div class="compare-col col-benefit">
+      <div class="col-emoji">🌟</div>
+      <div class="col-badge col-badge-benefit">ベネフィット</div>
+      <div class="col-desc">
+        使った後の<br>
+        <strong>「自分の生活の変化」</strong>
+      </div>
+      <div class="col-examples">
+        「毎日の通学が楽！」<br>
+        「充電気にせず遊べる！」<br>
+        「雨でも気にしない！」
+      </div>
+      <div class="col-reaction">
+        😍 これ欲しい！<br>（自分ごとに感じる）
+      </div>
+    </div>
+  </div>
+
+  <div class="key-msg">
+    <div class="title">💡 売れる言葉のコツ</div>
+    <div class="body">
+      「機能（メリット）」を伝えるだけじゃ売れない。<br>
+      「使った後どうなるか（ベネフィット）」を伝えると人は動く。
+    </div>
+  </div>
+
+  <div class="example-box">
+    <strong>🎧 ワイヤレスイヤホンで例えると</strong><br>
+    ❌ メリット止まり：「ノイズキャンセリング搭載」<br>
+    ✅ ベネフィット：「電車の中でも勉強に集中できる！」
+  </div>
+</div>
+
+</body>
+</html>
