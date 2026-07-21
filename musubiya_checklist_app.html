@@ -369,6 +369,78 @@ main{max-width:640px;margin:0 auto;padding:14px 12px 20px}
 }
 .acc.open .acc-body{display:block}
 
+/* 参考写真ボタン */
+.photo-ref-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:5px 12px;
+  margin-left:auto;
+  background:#FFF3EE;
+  border:2px solid #E8B7A0;
+  border-radius:999px;
+  font-size:.75rem;
+  font-weight:800;
+  color:#C47A5A;
+  white-space:nowrap;
+  flex:none;
+}
+.photo-ref-btn:active{background:#FFE8DD}
+.photo-ref-modal{
+  position:fixed;inset:0;z-index:55;
+  background:rgba(90,74,66,.55);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+.photo-ref-modal[hidden]{display:none}
+.photo-ref-sheet{
+  width:100%;max-width:400px;
+  background:var(--paper);
+  border-radius:24px;
+  padding:24px 20px;
+  box-shadow:0 8px 30px rgba(0,0,0,.2);
+}
+.photo-ref-title{
+  font-size:1rem;font-weight:800;
+  color:var(--green-deep);
+  margin-bottom:16px;
+  text-align:center;
+}
+.photo-ref-link{
+  display:block;
+  width:100%;
+  min-height:50px;
+  text-align:center;
+  text-decoration:none;
+  line-height:50px;
+  background:linear-gradient(180deg,#6FBE97,#5FB08A);
+  color:#fff;
+  border:none;
+  border-radius:999px;
+  font-size:.95rem;
+  font-weight:800;
+  box-shadow:0 4px 0 #4A9573;
+  margin-bottom:10px;
+}
+.photo-ref-link:active{transform:scale(.96)}
+.photo-ref-close{
+  display:block;
+  width:100%;
+  min-height:46px;
+  margin-top:6px;
+  background:var(--card);
+  color:var(--ink-sub);
+  border:2px solid var(--line);
+  border-radius:999px;
+  font-size:.9rem;
+  font-weight:700;
+}
+.photo-ref-nodata{
+  text-align:center;
+  font-size:.88rem;
+  color:var(--ink-sub);
+  padding:16px 0;
+  line-height:1.7;
+}
+
 /* 補充リスト */
 .supply-std{
   font-size:.8rem;
@@ -812,6 +884,14 @@ button[data-armed="1"]{background:var(--danger)!important;color:#fff!important;b
   </div>
 </div>
 
+<div class="photo-ref-modal" id="photoRefModal" hidden>
+  <div class="photo-ref-sheet">
+    <div class="photo-ref-title" id="photoRefTitle"></div>
+    <div id="photoRefBody"></div>
+    <button class="photo-ref-close" id="photoRefClose">閉じる</button>
+  </div>
+</div>
+
 <!-- ========== ★お祝い画面 ========== -->
 <div id="celebrate" hidden>
   <div class="cel-duck">🦆</div>
@@ -1068,6 +1148,18 @@ const CLEANING_DATA = {
       { id: "ctc-02", label: "緊急駆けつけ対応窓口", value: "" }
     ],
     note: "連絡先欄は各拠点の最新情報に差し替えてご利用ください。"
+  },
+
+  roomPhotos: {
+    "波部屋": {
+      "flow":      "",
+      "kitchen":        "https://drive.google.com/drive/folders/XXXXX_wave_kitchen",
+      "living_bedroom": "https://drive.google.com/drive/folders/XXXXX_wave_living",
+      "bathroom":       "https://drive.google.com/drive/folders/XXXXX_wave_bath",
+      "washroom":       "https://drive.google.com/drive/folders/XXXXX_wave_wash",
+      "toilet":         "https://drive.google.com/drive/folders/XXXXX_wave_toilet",
+      "entrance":       "https://drive.google.com/drive/folders/XXXXX_wave_entrance"
+    }
   }
 };
 
@@ -1221,8 +1313,11 @@ function renderFlow(){
         f.relatedAreas.forEach(aid => {
           const a = D.areaChecklists.find(x => x.id === aid);
           if(!a) return;
+          const hasP = state && D.roomPhotos && D.roomPhotos[state.room] && D.roomPhotos[state.room][a.id];
           html += '<div class="exp-title">' + a.name.replace(/^3-\d+\.\s*/, "")
-                + '　<span class="sec-count" data-areacnt="' + a.id + '"></span></div>';
+                + '　<span class="sec-count" data-areacnt="' + a.id + '"></span>'
+                + (hasP ? ' <span class="photo-ref-btn" data-photoarea="' + a.id + '" style="font-size:.7rem;padding:3px 8px">📷</span>' : '')
+                + '</div>';
           a.items.forEach(it => { html += rowHTML(it.id, a.colorHint, areaRowInner(it)); });
         });
         html += '</div>';
@@ -1238,10 +1333,12 @@ function renderArea(){
   let html = '<div class="sec-head"><span class="sec-title">エリア別チェックリスト</span></div>'
            + '<p class="sec-note">見出しをタップで開閉します。自己判断で省略せず、上から順に実施してください。</p>';
   D.areaChecklists.forEach(a => {
+    const hasPhoto = state && D.roomPhotos && D.roomPhotos[state.room] && D.roomPhotos[state.room][a.id];
     html += '<div class="acc" id="acc-' + a.id + '">'
           + '<button class="acc-head" style="background:' + a.colorHint + '" data-acc="' + a.id + '">'
           + a.name
           + '<span class="acc-count" data-areacnt="' + a.id + '"></span>'
+          + (hasPhoto ? '<span class="photo-ref-btn" data-photoarea="' + a.id + '">📷 参考写真</span>' : '')
           + '<span class="acc-arrow">▼</span></button>'
           + '<div class="acc-body">';
     a.items.forEach(it => {
@@ -1319,6 +1416,8 @@ document.addEventListener("click", e => {
     }
     return;
   }
+  const photoBtn = e.target.closest(".photo-ref-btn");
+  if(photoBtn){ e.stopPropagation(); openPhotoRef(photoBtn.dataset.photoarea); return; }
   const accHead = e.target.closest(".acc-head");
   if(accHead){ accHead.parentElement.classList.toggle("open"); return; }
   const row = e.target.closest(".row");
@@ -1338,6 +1437,26 @@ function toggleCheck(id){
   saveSession();
   updateUI();
 }
+
+/* ============ 参考写真モーダル ============ */
+function openPhotoRef(areaId){
+  const modal = $("#photoRefModal");
+  const title = $("#photoRefTitle");
+  const body  = $("#photoRefBody");
+  const area  = D.areaChecklists.find(a => a.id === areaId);
+  const areaName = area ? area.name : areaId;
+  const roomData = D.roomPhotos && D.roomPhotos[state.room];
+  const url = roomData && roomData[areaId];
+  title.textContent = "📷 " + state.room + " — " + areaName.replace(/^3-\d+\.\s*/, "");
+  if(url){
+    body.innerHTML = '<a class="photo-ref-link" href="' + url + '" target="_blank" rel="noopener">参考写真を見る →</a>';
+  } else {
+    body.innerHTML = '<div class="photo-ref-nodata">この部屋の参考写真はまだ<br>登録されていません</div>';
+  }
+  modal.hidden = false;
+}
+$("#photoRefClose").addEventListener("click", () => { $("#photoRefModal").hidden = true; });
+$("#photoRefModal").addEventListener("click", e => { if(e.target === e.currentTarget) e.currentTarget.hidden = true; });
 
 function switchTab(name){
   $$(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
