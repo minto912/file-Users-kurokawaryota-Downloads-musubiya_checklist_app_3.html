@@ -1926,6 +1926,13 @@ if(numEl && window.MutationObserver){
   }).observe(numEl, { childList: true, characterData: true, subtree: true });
 }
 })();
+
+/* オフライン対応（サービスワーカー登録） */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
