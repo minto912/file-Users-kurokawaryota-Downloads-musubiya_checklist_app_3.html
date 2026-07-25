@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7FC8A9"/>
+      <stop offset="100%" stop-color="#4E9E79"/>
+    </linearGradient>
+    <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="6" cy="6" r="2.4" fill="#FFFFFF" opacity="0.14"/>
+      <circle cx="18" cy="18" r="2.4" fill="#FFFFFF" opacity="0.14"/>
+    </pattern>
+  </defs>
+
+  <rect width="180" height="180" fill="url(#bg)"/>
+  <rect width="180" height="180" fill="url(#dots)"/>
+
+  <circle cx="90" cy="88" r="58" fill="#FFF9F0"/>
+  <circle cx="90" cy="88" r="58" fill="none" stroke="#F5A9B8" stroke-width="3.5"/>
+
+  <path d="M62 88 l19 20 l38 -42"
+        fill="none" stroke="#4E9E79" stroke-width="13"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <circle cx="90" cy="163" r="5" fill="#F5A9B8"/>
+  <circle cx="72" cy="163" r="5" fill="#FFF9F0" opacity="0.75"/>
+  <circle cx="108" cy="163" r="5" fill="#FFF9F0" opacity="0.75"/>
+</svg>
