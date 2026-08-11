@@ -932,15 +932,18 @@ button[data-armed="1"]{background:var(--danger)!important;color:#fff!important;b
      ・キッチンに「食器用洗剤の残量確認」を追加
      ・歯ブラシは洗面所、ウェルカムアメニティはフロー⑬の補足に記載
      ・フローの「チェック詳細」はタブ移動せずその場で開閉できるように変更
+   更新: 2026-08-11 玄関に「スリッパを並べる」を追加（v2.0）
+     ・対象は紅葉部屋・桜部屋・富士部屋の3室のみ（桜2号は対象外）
+     ・玄関に3個並べ、予備は頭上の棚
    ===================================================== */
 
 const CLEANING_DATA = {
 
   meta: {
     title: "MUSUBIYA SAPPORO 清掃マニュアル（全室共通版）",
-    dataVersion: "1.9k",
+    dataVersion: "2.0",
     createdAt: "2026-07-07",
-    updatedAt: "2026-07-10",
+    updatedAt: "2026-08-11",
     rooms: ["波部屋", "桜部屋", "富士部屋", "桜2号", "紅葉部屋", "ジブリ部屋"]
   },
 
@@ -1006,7 +1009,7 @@ const CLEANING_DATA = {
       point: "ウェルカムアメニティは備品リストに準じて規定数を補充" },
     { id: "flow-14", no: 14, phaseId: "leaving",
       task: "玄関を掃除する",
-      point: "",
+      point: "紅葉・桜・富士のみ：スリッパ3個を玄関に並べる（予備は頭上の棚）",
       relatedAreas: ["entrance"] },
     { id: "flow-15", no: 15, phaseId: "leaving",
       task: "マンションのゴミ捨て場にゴミを出す",
@@ -1099,6 +1102,7 @@ const CLEANING_DATA = {
         { id: "ent-03", text: "案内表示（Wi-Fi情報・ハウスルール等）が所定の場所にあるか確認" },
         { id: "ent-04", text: "共用廊下・ゴミ置き場周辺のゴミ・私物がないか確認" },
         { id: "ent-05", text: "スリッパ裏面を拭く" },
+        { id: "ent-07", text: "【紅葉・桜・富士のみ】スリッパ3個を玄関に並べる（予備は頭上の棚）" },
         { id: "ent-06", text: "バルコニーのボックス内にゴミがないか確認して写真を撮る" }
       ]
     }

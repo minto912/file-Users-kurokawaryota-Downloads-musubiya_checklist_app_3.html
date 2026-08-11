@@ -2,7 +2,7 @@
 //
 // index.html を更新したら CACHE_VERSION の数字を上げること。
 // 上げ忘れると、スタッフの端末に古い画面が残り続ける。
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v2";
 const CACHE = "musubiya-" + CACHE_VERSION;
 
 const ASSETS = [
